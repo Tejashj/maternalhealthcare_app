@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth/patient_login_screen.dart';
+import 'auth/doctor_login_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -53,7 +54,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PatientLoginScreen(),
+                      builder: (context) => const DoctorLoginScreen(),
                     ),
                   );
                 },

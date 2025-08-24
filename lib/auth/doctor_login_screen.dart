@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/patient_side/screens/home.dart';
+import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
 
 class DoctorLoginScreen extends StatelessWidget {
   const DoctorLoginScreen({super.key});
@@ -16,7 +16,7 @@ class DoctorLoginScreen extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                  builder: (context) => const PatientHomeScreen(),
+                  builder: (context) => const DoctorHomeScreen(),
                 ),
                 (Route<dynamic> route) => false,
               );

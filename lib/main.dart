@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maternalhealthcare/doctor_side/provider/doctor_provider.dart';
 import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
 import 'package:provider/provider.dart';
 import 'role_selection.dart';
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => PatientDataProvider()),
-        ChangeNotifierProvider(create: (_) => PatientDataProvider()),
+        ChangeNotifierProvider(create: (_) => DoctorDataProvider()),
       ],
       child: MaterialApp(
         title: 'Health App',
