@@ -47,28 +47,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyANgfCtpejsNrJkhMPdqnHjH3asRoCj2bc',
-    appId: '1:795264122204:web:b41e01400ac040253c9599',
-    messagingSenderId: '795264122204',
-    projectId: 'maternal-healthcare-app',
-    authDomain: 'maternal-healthcare-app.firebaseapp.com',
-    storageBucket: 'maternal-healthcare-app.firebasestorage.app',
+    apiKey: 'AIzaSyCyO4G7l24ADPT-VCOcBUCBpQ1z9O-0T5U',
+    appId: '1:244926327377:web:914373170246c8a103a670',
+    messagingSenderId: '244926327377',
+    projectId: 'maternal-healthcare-app-20c2c',
+    authDomain: 'maternal-healthcare-app-20c2c.firebaseapp.com',
+    storageBucket: 'maternal-healthcare-app-20c2c.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCOnqvvIumiqX93kIc1aOMERarm32-2c5E',
-    appId: '1:795264122204:android:1e56fdf2491792193c9599',
-    messagingSenderId: '795264122204',
-    projectId: 'maternal-healthcare-app',
-    storageBucket: 'maternal-healthcare-app.firebasestorage.app',
+    apiKey: 'AIzaSyBi7FTwxvNWmfHcYoxmY392QOSthmdCNFE',
+    appId: '1:244926327377:android:d0c9d052702bdfa303a670',
+    messagingSenderId: '244926327377',
+    projectId: 'maternal-healthcare-app-20c2c',
+    storageBucket: 'maternal-healthcare-app-20c2c.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC7VNQQVMgq3ZJu7l1d_cdZI9mFEwy4_vM',
-    appId: '1:795264122204:ios:b3b1b84cb71aca8e3c9599',
-    messagingSenderId: '795264122204',
-    projectId: 'maternal-healthcare-app',
-    storageBucket: 'maternal-healthcare-app.firebasestorage.app',
+    apiKey: 'AIzaSyAscwQfKc9KiTLx1vx6nLxpA9o4-xMRTpw',
+    appId: '1:244926327377:ios:4818695cdd65a33603a670',
+    messagingSenderId: '244926327377',
+    projectId: 'maternal-healthcare-app-20c2c',
+    storageBucket: 'maternal-healthcare-app-20c2c.firebasestorage.app',
     iosBundleId: 'com.example.maternalhealthcare',
   );
+
 }
