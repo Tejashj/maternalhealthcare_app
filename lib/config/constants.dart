@@ -6,3 +6,8 @@ class AppConstants {
   static final String supabaseAnonKey =
       dotenv.env['SUPABASE_ANON_KEY'] ?? 'default_key';
 }
+
+class AppwriteConstants {
+  static const String endpoint =
+      'https://cloud.appwrite.io/v1'; // Your API endpoint
+}

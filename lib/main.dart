@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:maternalhealthcare/config/appwrite_client.dart';
 import 'package:maternalhealthcare/doctor_side/provider/doctor_provider.dart';
 import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
 import 'package:maternalhealthcare/role_selection.dart';
@@ -22,6 +23,9 @@ Future<void> main() async {
     url: AppConstants.supabaseUrl,
     anonKey: AppConstants.supabaseAnonKey,
   );
+
+  // Initialize Appwrite
+  AppwriteClient.instance.init();
 
   // Run the app with providers
   runApp(const MyApp());
