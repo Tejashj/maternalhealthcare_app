@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'auth/patient_login_screen.dart';
-import 'auth/doctor_login_screen.dart';
+import 'package:maternalhealthcare/doctor_side/screens/doctor_login_screen.dart';
+import 'package:maternalhealthcare/patient_side/screens/patient_login_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});

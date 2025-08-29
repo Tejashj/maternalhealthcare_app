@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
+import 'package:maternalhealthcare/auth/auth_gate.dart';
 
 class DoctorLoginScreen extends StatelessWidget {
   const DoctorLoginScreen({super.key});
@@ -15,9 +15,7 @@ class DoctorLoginScreen extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const DoctorHomeScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => AuthGate()),
                 (Route<dynamic> route) => false,
               );
             },

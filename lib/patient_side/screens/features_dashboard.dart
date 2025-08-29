@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:maternalhealthcare/auth/profile.dart';
+import 'package:maternalhealthcare/patient_side/screens/diet_screen.dart';
 import '../widgets/feature_button.dart';
 
 class FeaturesDashboardScreen extends StatelessWidget {
@@ -22,24 +23,77 @@ class FeaturesDashboardScreen extends StatelessWidget {
             icon: const Icon(Icons.account_circle_outlined),
             tooltip: 'Manage Profile',
             onPressed: () {
-              // Handle profile tap
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
             },
           ),
         ],
       ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(), // Enhanced scrolling
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            FeatureButton(title: 'Diet & Exercises', onTap: () {}),
+            FeatureButton(
+              title: 'Diet & Exercises',
+              imagePath:
+                  'assets/images/diet_exercise.png', // Add your image path
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PatientDietScreen(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 12),
-            FeatureButton(title: 'Prescription analysis', onTap: () {}),
+            FeatureButton(
+              title: 'Prescription analysis',
+              imagePath:
+                  'assets/images/prescription.png', // Add your image path
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
+            ),
             const SizedBox(height: 12),
-            FeatureButton(title: 'Vaccination updates', onTap: () {}),
+            FeatureButton(
+              title: 'Vaccination updates',
+              imagePath: 'assets/images/vaccination.png', // Add your image path
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
+            ),
             const SizedBox(height: 12),
-            FeatureButton(title: 'Library & Relaxation', onTap: () {}),
+            FeatureButton(
+              title: 'Library & Relaxation',
+              imagePath: 'assets/images/library.png', // Add your image path
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
+            ),
             const SizedBox(height: 12),
-            FeatureButton(title: 'Government schemes', onTap: () {}),
+            FeatureButton(
+              title: 'Government schemes',
+              imagePath: 'assets/images/government.png', // Add your image path
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
+            ),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -48,9 +102,18 @@ class FeaturesDashboardScreen extends StatelessWidget {
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.sos_rounded),
                     label: const Text('SOS'),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfilePage(),
+                        ),
+                      );
+                    },
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                      ), // Increased padding
                       foregroundColor: Colors.red,
                       side: const BorderSide(color: Colors.red),
                       shape: RoundedRectangleBorder(
@@ -64,9 +127,18 @@ class FeaturesDashboardScreen extends StatelessWidget {
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.chat_bubble_outline_rounded),
                     label: const Text('Chatbot'),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfilePage(),
+                        ),
+                      );
+                    },
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                      ), // Increased padding
                       foregroundColor: Colors.blueAccent,
                       side: const BorderSide(color: Colors.blueAccent),
                       shape: RoundedRectangleBorder(
@@ -77,6 +149,9 @@ class FeaturesDashboardScreen extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(
+              height: 20,
+            ), // Extra bottom padding for better scrolling
           ],
         ),
       ),
