@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -149,10 +150,15 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
   }
 
   Future<String> getAIResponse(String userMessage) async {
-    final String apiKey =
-        'AIzaSyDIdxTtYMRvBtF9L8OUAlvfBsE6RlZflnw'; // Replace with your Gemini API key
+    final String? apiKey = dotenv.env['GEMINI_API_KEY'];
+    final String? baseUrl = dotenv.env['GEMINI_API_URL'];
+
+    if (apiKey == null || baseUrl == null) {
+      return 'API credentials not found. Please check your .env file.';
+    }
+
     final String endpoint =
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey';
+        '$baseUrl/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey';
 
     final response = await http.post(
       Uri.parse(endpoint),
@@ -528,22 +534,17 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
                                 ),
                                 decoration: BoxDecoration(
                                   color:
-                                      isUser
-                                          ? Colors.blue[100]
-                                          : Colors.grey[200],
+                                      isUser ? Colors.white : Colors.grey[300],
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color:
-                                        isUser
-                                            ? Colors.blue[200]!
-                                            : Colors.grey[400]!,
-                                    width: 1,
+                                    color: Colors.black,
+                                    width: 2,
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 3),
                                     ),
                                   ],
                                 ),
@@ -551,9 +552,9 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
                                   message["message"]!,
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    height: 1.4,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    height: 1.5,
                                   ),
                                 ),
                               ),
