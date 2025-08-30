@@ -3,6 +3,8 @@ import 'package:maternalhealthcare/auth/profile.dart';
 import 'package:maternalhealthcare/doc_prescription/first_page.dart';
 import 'package:maternalhealthcare/patient_side/screens/diet_screen.dart';
 import '../widgets/feature_button.dart';
+import 'package:maternalhealthcare/duedate.dart';
+import 'package:maternalhealthcare/ovulation.dart';
 
 class FeaturesDashboardScreen extends StatelessWidget {
   const FeaturesDashboardScreen({super.key});
@@ -64,6 +66,18 @@ class FeaturesDashboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             FeatureButton(
+              title: 'Calculate Due Date',
+              imagePath:
+                  'assets/images/prescription.png', // Add your image path
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DueDateCalculator()),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            FeatureButton(
               title: 'Vaccination updates',
               imagePath: 'assets/images/vaccination.png', // Add your image path
               onTap: () {
@@ -81,6 +95,17 @@ class FeaturesDashboardScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+            FeatureButton(
+              title: 'Ovulation & Cycle Tracker',
+              imagePath: 'assets/images/government.png', // Add your image path
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const OvulationCalculatorPage()),
                 );
               },
             ),
