@@ -1,5 +1,5 @@
-// patient_detail_screen.dart
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -10,22 +10,24 @@ class PatientDetailScreen extends StatelessWidget {
 
   const PatientDetailScreen({super.key, required this.patient});
 
-  // Ask for permissions
+  // Ask for permissions (IMPROVED VERSION)
   Future<bool> _askPermissions() async {
-    // Check and request storage or photo permissions based on the platform
     if (Platform.isAndroid) {
-      if (await Permission.storage.isDenied) {
-        await Permission.storage.request();
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      PermissionStatus status;
+      // For Android 13 (API 33) and above, request specific media permissions
+      if (androidInfo.version.sdkInt >= 33) {
+        status = await Permission.photos.request();
+      } else {
+        // For older versions, request storage permission
+        status = await Permission.storage.request();
       }
-      return await Permission.storage.isGranted;
+      return status.isGranted;
     } else if (Platform.isIOS) {
-      if (await Permission.photos.isDenied) {
-        await Permission.photos.request();
-      }
-      return await Permission.photos.isGranted;
+      // On iOS, Permission.photos is the correct one to use
+      return await Permission.photos.request().isGranted;
     }
-    // For other platforms, assume permission is not an issue
-    return true;
+    return true; // For other platforms
   }
 
   // Upload prescription (image only)
