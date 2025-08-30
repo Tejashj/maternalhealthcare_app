@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/doctor_provider.dart';
 import '../widgets/patient_card.dart';
-import 'PatientDetailsScreen.dart'; // 👈 add this import
+import 'PatientDetailsScreen.dart';
 
 class PatientsDashboardScreen extends StatelessWidget {
   const PatientsDashboardScreen({super.key});

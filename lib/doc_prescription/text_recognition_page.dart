@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -43,12 +43,14 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
       final inputImage = InputImage.fromFilePath(widget.imagePath);
 
       // Initialize the text recognizer (supports both printed and handwritten text)
-      final textRecognizer =
-          TextRecognizer(script: TextRecognitionScript.latin);
+      final textRecognizer = TextRecognizer(
+        script: TextRecognitionScript.latin,
+      );
 
       // Process the image to recognize text
-      final RecognizedText recognizedText =
-          await textRecognizer.processImage(inputImage);
+      final RecognizedText recognizedText = await textRecognizer.processImage(
+        inputImage,
+      );
 
       // Extract and format the recognized text
       String extractedText = '';
@@ -71,9 +73,9 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error recognizing text: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error recognizing text: $e')));
     }
   }
 
@@ -85,9 +87,9 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
       if (_extractedText.isNotEmpty) {
         await _flutterTts.speak(_extractedText); // Start reading
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No text to read.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('No text to read.')));
       }
     }
     setState(() {
@@ -161,77 +163,86 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
       body: Column(
         children: [
           Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Card(
-                      elevation: 8, // Increased shadow for a larger card effect
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(16), // Larger rounded corners
-                      ),
-                      child: Container(
-                        height: MediaQuery.of(context).size.height *
-                            0.6, // 60% of screen height
-                        padding:
-                            const EdgeInsets.all(24.0), // Reasonable padding
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Recognized Text:',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      Colors.pink[900], // Brighter title color
+            child:
+                _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Card(
+                        elevation:
+                            8, // Increased shadow for a larger card effect
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            16,
+                          ), // Larger rounded corners
+                        ),
+                        child: Container(
+                          height:
+                              MediaQuery.of(context).size.height *
+                              0.6, // 60% of screen height
+                          padding: const EdgeInsets.all(
+                            24.0,
+                          ), // Reasonable padding
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Recognized Text:',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Colors
+                                            .pink[900], // Brighter title color
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                  height: 16), // Spacing between title and text
-                              Text(
-                                _extractedText.isNotEmpty
-                                    ? _extractedText
-                                    : 'No text recognized.',
-                                textAlign:
-                                    TextAlign.justify, // Justify the text
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black87, // Brighter text color
+                                SizedBox(
+                                  height: 16,
+                                ), // Spacing between title and text
+                                Text(
+                                  _extractedText.isNotEmpty
+                                      ? _extractedText
+                                      : 'No text recognized.',
+                                  textAlign:
+                                      TextAlign.justify, // Justify the text
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color:
+                                        Colors.black87, // Brighter text color
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 20),
-                              if (_aiResponse.isNotEmpty)
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'AI Analysis:',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.pink[900],
+                                SizedBox(height: 20),
+                                if (_aiResponse.isNotEmpty)
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'AI Analysis:',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.pink[900],
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      _aiResponse,
-                                      textAlign: TextAlign.justify,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.black87,
+                                      SizedBox(height: 10),
+                                      Text(
+                                        _aiResponse,
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.black87,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                            ],
+                                    ],
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -244,24 +255,17 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: _isAnalyzing
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          'Analyzing...',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ],
-                    )
-                  : Text(
-                      'Analyze with AI',
-                      style: TextStyle(fontSize: 18),
-                    ),
+              child:
+                  _isAnalyzing
+                      ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(color: Colors.white),
+                          SizedBox(width: 10),
+                          Text('Analyzing...', style: TextStyle(fontSize: 18)),
+                        ],
+                      )
+                      : Text('Analyze with AI', style: TextStyle(fontSize: 18)),
             ),
           ),
         ],

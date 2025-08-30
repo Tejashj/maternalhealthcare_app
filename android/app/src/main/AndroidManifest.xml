@@ -1,16 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.maternalhealthcare">
-
-    <!-- ✅ Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- For Android 10 and below -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
-
-    <!-- For Android 11+ (Scoped Storage) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
@@ -28,7 +19,6 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
-            <!-- Theme shown while Flutter initializes -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
