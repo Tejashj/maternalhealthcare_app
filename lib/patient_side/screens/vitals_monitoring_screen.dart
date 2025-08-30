@@ -3,21 +3,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class ECGMonitorApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Maternal Healthcare ECG Monitor',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: ECGMonitorScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
 class ECGData {
   final double time;
   final double value;
@@ -25,12 +10,12 @@ class ECGData {
   ECGData(this.time, this.value);
 }
 
-class ECGMonitorScreen extends StatefulWidget {
+class VitalsMonitoringScreen extends StatefulWidget {
   @override
-  _ECGMonitorScreenState createState() => _ECGMonitorScreenState();
+  _VitalsMonitoringScreenState createState() => _VitalsMonitoringScreenState();
 }
 
-class _ECGMonitorScreenState extends State<ECGMonitorScreen> {
+class _VitalsMonitoringScreenState extends State<VitalsMonitoringScreen> {
   List<ECGData> _ecgData = [];
   int _bpm = 0;
   Timer? _dataTimer;
@@ -247,11 +232,12 @@ class _ECGMonitorScreenState extends State<ECGMonitorScreen> {
           // Timer and status
           Container(
             padding: EdgeInsets.all(8),
-            color: _monitoringComplete
-                ? Colors.blue[100]
-                : _isMonitoring
-                ? Colors.green[100]
-                : Colors.grey[200],
+            color:
+                _monitoringComplete
+                    ? Colors.blue[100]
+                    : _isMonitoring
+                    ? Colors.green[100]
+                    : Colors.grey[200],
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -261,11 +247,12 @@ class _ECGMonitorScreenState extends State<ECGMonitorScreen> {
                       : _isMonitoring
                       ? Icons.timer
                       : Icons.timer_off,
-                  color: _monitoringComplete
-                      ? Colors.blue
-                      : _isMonitoring
-                      ? Colors.green
-                      : Colors.grey,
+                  color:
+                      _monitoringComplete
+                          ? Colors.blue
+                          : _isMonitoring
+                          ? Colors.green
+                          : Colors.grey,
                 ),
                 SizedBox(width: 8),
                 Text(
@@ -275,11 +262,12 @@ class _ECGMonitorScreenState extends State<ECGMonitorScreen> {
                       ? "${_secondsRemaining ~/ 60}:${(_secondsRemaining % 60).toString().padLeft(2, '0')} remaining"
                       : "Ready to start monitoring",
                   style: TextStyle(
-                    color: _monitoringComplete
-                        ? Colors.blue[800]
-                        : _isMonitoring
-                        ? Colors.green[800]
-                        : Colors.grey[800],
+                    color:
+                        _monitoringComplete
+                            ? Colors.blue[800]
+                            : _isMonitoring
+                            ? Colors.green[800]
+                            : Colors.grey[800],
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -348,9 +336,10 @@ class _ECGMonitorScreenState extends State<ECGMonitorScreen> {
                 ),
               ],
             ),
-            child: _monitoringComplete
-                ? _buildResultsPanel()
-                : _buildMonitoringPanel(),
+            child:
+                _monitoringComplete
+                    ? _buildResultsPanel()
+                    : _buildMonitoringPanel(),
           ),
         ],
       ),
@@ -371,23 +360,23 @@ class _ECGMonitorScreenState extends State<ECGMonitorScreen> {
         SizedBox(height: 16),
         _isMonitoring
             ? ElevatedButton(
-                onPressed: () {
-                  _completeMonitoring();
-                },
-                child: Text('Stop Monitoring'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
-              )
-            : ElevatedButton(
-                onPressed: _isConnected ? _startMonitoring : null,
-                child: Text('Start 2-Minute Monitoring'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
+              onPressed: () {
+                _completeMonitoring();
+              },
+              child: Text('Stop Monitoring'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
+            )
+            : ElevatedButton(
+              onPressed: _isConnected ? _startMonitoring : null,
+              child: Text('Start 2-Minute Monitoring'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              ),
+            ),
       ],
     );
   }
