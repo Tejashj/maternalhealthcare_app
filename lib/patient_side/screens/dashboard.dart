@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
+import 'package:maternalhealthcare/patient_side/screens/babypositiondetection.dart';
 import 'package:provider/provider.dart';
-import '../provider/patient_provider.dart';
+import 'vitals_monitoring_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -40,15 +42,15 @@ class DashboardScreen extends StatelessWidget {
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VitalsScreen(),
+                          // ** CHANGE: Navigate to the real monitoring screen **
+                          builder: (context) => VitalsMonitoringScreen(),
                         ),
                       ),
                   cardType: CardType.monitoring,
-                  isVitalsCard: true,
                 ),
                 const SizedBox(height: 8),
 
-                // Fetal Monitoring Card
+                // Fetal Monitoring Card (example navigation)
                 UnifiedCard(
                   title: 'Fetal Monitoring',
                   isLoading: patientData.isFetalDataLoading,
@@ -59,47 +61,26 @@ class DashboardScreen extends StatelessWidget {
                                 DataChip(label: data.name, value: data.value),
                           )
                           .toList(),
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FetalMonitoringScreen(),
-                        ),
-                      ),
+                  onTap: () {
+                    // TODO: Navigate to FetalMonitoringScreen when it's built
+                  },
                   cardType: CardType.monitoring,
-                  isFetalCard: true,
                 ),
                 const SizedBox(height: 8),
-
-                // Fetal Position Detection Card
                 UnifiedCard(
-                  title: 'Fetal Position Detection',
-                  buttonText: 'Analyze Position',
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FetalPositionScreen(),
-                        ),
+                  title: 'Baby Head Classification',
+                  buttonText: 'Classify Head',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BabyHeadClassifier(),
                       ),
+                    );
+                  },
                   cardType: CardType.action,
                 ),
                 const SizedBox(height: 8),
-
-                // Ultrasound Report Analysis Card
-                UnifiedCard(
-                  title: 'Ultrasound Report Analysis',
-                  buttonText: 'Upload & Analyze',
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => const UltrasoundAnalysisScreen(),
-                        ),
-                      ),
-                  cardType: CardType.action,
-                ),
               ],
             ),
           ),
@@ -116,14 +97,8 @@ class UnifiedCard extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
   final CardType cardType;
-
-  // For monitoring cards
   final bool? isLoading;
   final List<Widget>? dataWidgets;
-  final bool isVitalsCard;
-  final bool isFetalCard;
-
-  // For action cards
   final String? buttonText;
 
   const UnifiedCard({
@@ -134,17 +109,16 @@ class UnifiedCard extends StatelessWidget {
     this.isLoading,
     this.dataWidgets,
     this.buttonText,
-    this.isVitalsCard = false,
-    this.isFetalCard = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: isVitalsCard ? 280 : 180, // Increased vitals card height more
+      height: 150,
+      width: double.infinity,
       child: Card(
-        elevation: 2, // Added elevation back
-        color: Colors.white, // White background
+        elevation: 0.5,
+        color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: InkWell(
           onTap: onTap,
@@ -154,7 +128,6 @@ class UnifiedCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header row (simplified - no refresh button)
                 Text(
                   title,
                   style: const TextStyle(
@@ -163,8 +136,6 @@ class UnifiedCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-
-                // Content area
                 Expanded(child: _buildContent()),
               ],
             ),
@@ -179,26 +150,8 @@ class UnifiedCard extends StatelessWidget {
       case CardType.monitoring:
         if (isLoading == true) {
           return const Center(child: CircularProgressIndicator());
-        } else {
-          if (isVitalsCard || isFetalCard) {
-            // Static display for both monitoring cards (no scrolling)
-            return Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: dataWidgets ?? [],
-            );
-          } else {
-            // This case shouldn't occur with current setup
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: dataWidgets ?? [],
-              ),
-            );
-          }
         }
+        return Wrap(spacing: 8.0, runSpacing: 8.0, children: dataWidgets ?? []);
       case CardType.action:
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -227,7 +180,7 @@ class UnifiedCard extends StatelessWidget {
   }
 }
 
-// DataChip widget (moved from dashboard)
+// DataChip widget
 class DataChip extends StatelessWidget {
   final String label;
   final String value;
@@ -250,95 +203,6 @@ class DataChip extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// Placeholder screens for navigation
-class VitalsScreen extends StatelessWidget {
-  const VitalsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vitals Monitoring'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
-      ),
-      body: const Center(
-        child: Text(
-          'Vitals Monitoring Screen',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
-
-class FetalMonitoringScreen extends StatelessWidget {
-  const FetalMonitoringScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Fetal Monitoring'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
-      ),
-      body: const Center(
-        child: Text(
-          'Fetal Monitoring Screen',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
-
-class FetalPositionScreen extends StatelessWidget {
-  const FetalPositionScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Fetal Position Detection'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
-      ),
-      body: const Center(
-        child: Text(
-          'Fetal Position Detection Screen',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
-
-class UltrasoundAnalysisScreen extends StatelessWidget {
-  const UltrasoundAnalysisScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ultrasound Analysis'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 1,
-      ),
-      body: const Center(
-        child: Text(
-          'Ultrasound Analysis Screen',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
     );
