@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maternalhealthcare/auth/profile.dart';
+import 'package:maternalhealthcare/doc_prescription/first_page.dart';
 import 'package:maternalhealthcare/patient_side/screens/diet_screen.dart';
 import '../widgets/feature_button.dart';
 
@@ -57,7 +58,7 @@ class FeaturesDashboardScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  MaterialPageRoute(builder: (context) => const HomePage()),
                 );
               },
             ),
