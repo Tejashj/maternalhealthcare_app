@@ -4,7 +4,7 @@ import 'package:maternalhealthcare/patient_side/widgets/action_card.dart';
 import 'package:maternalhealthcare/patient_side/widgets/monitoring_card.dart';
 import 'package:provider/provider.dart';
 import 'maternaldashboard.dart';
-import 'positionclassifier.dart';
+import 'ml.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -59,7 +59,7 @@ class DashboardScreen extends StatelessWidget {
 
                 // Action cards with navigation
                 ActionCard(
-                  title: 'Fetal Position Detection',
+                  title: 'Monitor Vitals',
                   buttonText: 'Analyze Position',
                   onButtonPressed: () {
                     Navigator.push(
@@ -79,7 +79,7 @@ class DashboardScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => FetalPositionClassifier(),
+                        builder: (context) => BabyHeadClassifier(),
                       ),
                     );
                   },

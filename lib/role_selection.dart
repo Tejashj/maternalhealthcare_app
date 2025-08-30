@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/doctor_side/screens/doctor_login_screen.dart';
+import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
 import 'package:maternalhealthcare/patient_side/screens/patient_login_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -54,7 +54,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const DoctorLoginScreen(),
+                      builder: (context) => const DoctorHomeScreen(),
                     ),
                   );
                 },

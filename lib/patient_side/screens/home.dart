@@ -31,26 +31,42 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
     return Scaffold(
       body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black, // Black background
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.analytics_outlined),
-            activeIcon: Icon(Icons.analytics_rounded),
+            icon: Icon(
+              Icons.analytics_outlined,
+              color: Colors.white,
+            ), // White icon
+            activeIcon: Icon(
+              Icons.analytics_rounded,
+              color: Colors.white,
+            ), // White active icon
             label: 'Dashboard',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.apps_outlined),
-            activeIcon: Icon(Icons.apps_rounded),
+            icon: Icon(Icons.apps_outlined, color: Colors.white), // White icon
+            activeIcon: Icon(
+              Icons.apps_rounded,
+              color: Colors.white,
+            ), // White active icon
             label: 'Features',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.folder_copy_outlined),
-            activeIcon: Icon(Icons.folder_copy_rounded),
+            icon: Icon(
+              Icons.folder_copy_outlined,
+              color: Colors.white,
+            ), // White icon
+            activeIcon: Icon(
+              Icons.folder_copy_rounded,
+              color: Colors.white,
+            ), // White active icon
             label: 'Records',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.white, // White selected label
+        unselectedItemColor: Colors.grey[400], // Light grey unselected label
         showUnselectedLabels: true,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,

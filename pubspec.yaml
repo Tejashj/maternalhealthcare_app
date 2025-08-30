@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   appwrite: ^18.0.0
+  color: ^3.0.0
   file_picker: ^10.3.2
   firebase_auth: ^6.0.1
   firebase_core: ^4.0.0
@@ -45,9 +46,7 @@ dependencies:
   supabase_flutter: ^2.10.0
   syncfusion_flutter_charts: ^30.2.7
   tflite_flutter: ^0.11.0
-
-
-
+  video_player: ^2.10.0
 
 dev_dependencies:
   flutter_test:
