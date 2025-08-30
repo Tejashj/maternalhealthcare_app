@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'appointments_screen.dart';
 import 'doctor_profile.dart';
 import 'patient_dashboard.dart';
+import 'package:maternalhealthcare/blockchain/bc_service.dart';
 
 class DoctorHomeScreen extends StatefulWidget {
   const DoctorHomeScreen({super.key});
@@ -29,43 +30,41 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
+
+      // ⬇️ Floating Action Button to navigate to blockchain patient page
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PatientPage()),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black, // Black background
+        backgroundColor: Colors.black,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.grid_view_outlined,
-              color: Colors.white,
-            ), // White icon
-            activeIcon: Icon(
-              Icons.grid_view_rounded,
-              color: Colors.white,
-            ), // White active icon
+            icon: Icon(Icons.grid_view_outlined, color: Colors.white),
+            activeIcon: Icon(Icons.grid_view_rounded, color: Colors.white),
             label: 'Patients',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.calendar_today_outlined,
-              color: Colors.white,
-            ), // White icon
-            activeIcon: Icon(
-              Icons.calendar_today_rounded,
-              color: Colors.white,
-            ), // White active icon
+            icon: Icon(Icons.calendar_today_outlined, color: Colors.white),
+            activeIcon: Icon(Icons.calendar_today_rounded, color: Colors.white),
             label: 'Appointments',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline, color: Colors.white), // White icon
-            activeIcon: Icon(
-              Icons.person_rounded,
-              color: Colors.white,
-            ), // White active icon
+            icon: Icon(Icons.person_outline, color: Colors.white),
+            activeIcon: Icon(Icons.person_rounded, color: Colors.white),
             label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white, // White selected label
-        unselectedItemColor: Colors.grey[400], // Light grey unselected label
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey[400],
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),

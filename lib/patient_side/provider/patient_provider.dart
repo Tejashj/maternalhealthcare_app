@@ -41,12 +41,7 @@ class PatientDataProvider with ChangeNotifier {
     // Simulate a network request
     await Future.delayed(const Duration(seconds: 1));
 
-    _vitals = [
-      Vital(name: 'Heart Rate', value: '82 bpm'),
-      Vital(name: 'Blood Pressure', value: '120/80 mmHg'),
-      Vital(name: 'SpO2', value: '98%'),
-      Vital(name: 'Temperature', value: '37.0°C'),
-    ];
+    _vitals = [Vital(name: 'Blood Pressure', value: '-- mmHg')];
     _isVitalsLoading = false;
     notifyListeners(); // Notify UI that data is ready
   }
@@ -57,11 +52,26 @@ class PatientDataProvider with ChangeNotifier {
 
     await Future.delayed(const Duration(seconds: 1));
 
-    _fetalData = [
-      FetalData(name: 'FHR', value: '140 bpm'),
-      FetalData(name: 'UC', value: '2 per 10 min'),
-    ];
+    _fetalData = [FetalData(name: 'FHR', value: '-- bpm')];
     _isFetalDataLoading = false;
+    notifyListeners();
+  }
+
+  // ** NEW METHOD: To update the heart rate from the monitoring screen **
+  void updateHeartRate(double averageBpm) {
+    // Find the index of the heart rate vital in our list
+    int index = _vitals.indexWhere((vital) => vital.name == 'Blood Pressure');
+    String newBpmValue = '${averageBpm.toStringAsFixed(0)} mmHg';
+
+    // If a 'Heart Rate' vital exists, update its value
+    if (index != -1) {
+      _vitals[index] = Vital(name: 'Blood Pressure', value: newBpmValue);
+    } else {
+      // Otherwise, add it to the list
+      _vitals.add(Vital(name: 'Blood Pressure', value: newBpmValue));
+    }
+
+    // Announce the change to all listening widgets (like the DashboardScreen)
     notifyListeners();
   }
 }
