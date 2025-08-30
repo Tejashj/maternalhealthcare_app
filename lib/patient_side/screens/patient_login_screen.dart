@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/patient_side/screens/home.dart';
+import 'home.dart';
 
 class PatientLoginScreen extends StatelessWidget {
   const PatientLoginScreen({super.key});

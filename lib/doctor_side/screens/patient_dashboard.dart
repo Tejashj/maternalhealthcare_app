@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../provider/doctor_provider.dart';
 import '../widgets/patient_card.dart';
+import 'PatientDetailsScreen.dart';
 
 class PatientsDashboardScreen extends StatelessWidget {
   const PatientsDashboardScreen({super.key});
@@ -39,7 +39,13 @@ class PatientsDashboardScreen extends StatelessWidget {
                   return PatientCard(
                     patientName: patient.name,
                     onTap: () {
-                      print('Tapped on ${patient.name}');
+                      // 👇 Navigate to detail screen with upload button
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PatientDetailScreen(patient: patient),
+                        ),
+                      );
                     },
                   );
                 },

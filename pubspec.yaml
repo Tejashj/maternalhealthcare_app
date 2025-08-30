@@ -28,16 +28,19 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  appwrite: ^18.0.0
+  camera: ^0.11.2
   color: ^3.0.0
-  file_picker: ^10.3.2
-  firebase_auth: ^6.0.1
-  firebase_core: ^4.0.0
   flutter:
     sdk: flutter
   flutter_dotenv: ^6.0.0
-  flutter_signin_button: ^2.1.1
-  flutter_tts: ^4.2.3
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.1
+  cloud_firestore: ^6.0.0
+  supabase_flutter: ^2.9.1
+  appwrite: ^18.0.0
+  file_picker: ^10.3.2
+  permission_handler: ^12.0.1
+  open_filex: ^4.7.0
   google_sign_in: ^6.1.6
   image: ^4.5.4
   image_picker: ^1.2.0
@@ -85,6 +88,9 @@ flutter:
     - assets/images/government.png
     - assets/models/model_unquant.tflite
     - assets/labels/labels.txt
+    - assets/images/duedate.png
+    - assets/images/ovulation.png
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

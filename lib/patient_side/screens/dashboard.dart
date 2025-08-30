@@ -34,12 +34,13 @@ class DashboardScreen extends StatelessWidget {
                   title: 'Vitals Monitoring',
                   isLoading: patientData.isVitalsLoading,
                   onRefresh: () => patientData.fetchVitals(),
-                  dataWidgets: patientData.vitals
-                      .map(
-                        (vital) =>
-                            DataChip(label: vital.name, value: vital.value),
-                      )
-                      .toList(),
+                  dataWidgets:
+                      patientData.vitals
+                          .map(
+                            (vital) =>
+                                DataChip(label: vital.name, value: vital.value),
+                          )
+                          .toList(),
                 ),
                 const SizedBox(height: 16),
 
@@ -48,12 +49,13 @@ class DashboardScreen extends StatelessWidget {
                   title: 'Fetal Monitoring',
                   isLoading: patientData.isFetalDataLoading,
                   onRefresh: () => patientData.fetchFetalData(),
-                  dataWidgets: patientData.fetalData
-                      .map(
-                        (data) =>
-                            DataChip(label: data.name, value: data.value),
-                      )
-                      .toList(),
+                  dataWidgets:
+                      patientData.fetalData
+                          .map(
+                            (data) =>
+                                DataChip(label: data.name, value: data.value),
+                          )
+                          .toList(),
                 ),
                 const SizedBox(height: 16),
 
@@ -65,7 +67,7 @@ class DashboardScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>  VitalsMonitoringScreen(),
+                        builder: (context) => VitalsMonitoringScreen(),
                       ),
                     );
                   },
@@ -84,6 +86,7 @@ class DashboardScreen extends StatelessWidget {
                     );
                   },
                 ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -121,4 +124,3 @@ class DataChip extends StatelessWidget {
     );
   }
 }
-
