@@ -28,30 +28,22 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-<<<<<<< HEAD
-  flutter_blue_plus: ^1.35.5
-  fl_chart: ^1.0.0
-  flutter_reactive_ble: ^5.4.0
-  http: ^1.5.0
-  syncfusion_flutter_charts: ^30.2.6+1
-=======
-  flutter_dotenv: ^6.0.0
-  provider: ^6.1.5+1
-  supabase_flutter: ^2.10.0
-  firebase_core: ^4.0.0
   appwrite: ^18.0.0
   firebase_auth: ^6.0.1
-  google_sign_in: ^6.1.6
+  firebase_core: ^4.0.0
+  flutter:
+    sdk: flutter
+  flutter_dotenv: ^6.0.0
   flutter_signin_button: ^2.1.1
-  speech_to_text: ^7.3.0
   flutter_tts: ^4.2.3
->>>>>>> a57a1d571e4bf2c5211739591e487dd0cec7da60
+  google_sign_in: ^6.1.6
+  provider: ^6.1.5+1
+  speech_to_text: ^7.3.0
+  supabase_flutter: ^2.10.0
+  syncfusion_flutter_charts: ^30.2.7
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -79,7 +71,7 @@ flutter:
   assets:
     - .env
 
-
+    
     - assets/images/diet_exercise.png
     - assets/images/prescription.png
     - assets/images/vaccination.png

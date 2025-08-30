@@ -4,9 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email'],
-  ); // Fixed constructor
+  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
 
   User? _user;
   bool _isLoading = false;
