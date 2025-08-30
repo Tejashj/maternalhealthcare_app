@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   appwrite: ^18.0.0
+  file_picker: ^10.3.2
   firebase_auth: ^6.0.1
   firebase_core: ^4.0.0
   flutter:
@@ -37,10 +38,13 @@ dependencies:
   flutter_signin_button: ^2.1.1
   flutter_tts: ^4.2.3
   google_sign_in: ^6.1.6
+  image: ^4.5.4
+  image_picker: ^1.2.0
   provider: ^6.1.5+1
   speech_to_text: ^7.3.0
   supabase_flutter: ^2.10.0
   syncfusion_flutter_charts: ^30.2.7
+  tflite_flutter: ^0.11.0
 
 
 
@@ -77,6 +81,8 @@ flutter:
     - assets/images/vaccination.png
     - assets/images/library.png
     - assets/images/government.png
+    - assets/models/model_unquant.tflite
+    - assets/labels/labels.txt
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
