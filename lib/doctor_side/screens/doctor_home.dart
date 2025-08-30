@@ -16,7 +16,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     PatientsDashboardScreen(),
-    AppointmentsScreen(),
+    UserDataScreen(),
     DoctorProfileScreen(),
   ];
 

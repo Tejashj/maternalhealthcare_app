@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:maternalhealthcare/auth/authwrapper.dart';
 import 'package:maternalhealthcare/config/appwrite_client.dart';
 import 'package:maternalhealthcare/doctor_side/provider/doctor_provider.dart';
 import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const RoleSelectionScreen(),
+        home: const AuthWrapper(),
         debugShowCheckedModeBanner: false,
       ),
     );

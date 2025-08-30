@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'record_button.dart';
+import 'take_appointment.dart'; // <-- Import your appointment page
 
 class HealthRecordsScreen extends StatefulWidget {
   const HealthRecordsScreen({super.key});
@@ -33,11 +34,13 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
 
       // Map each file to its public URL
       final List<String> urls =
-          files.map((file) {
-            return storage
-                .from('prescription_documents')
-                .getPublicUrl('prescription/${file.name}');
-          }).toList();
+          files
+              .map(
+                (file) => storage
+                    .from('prescription_documents')
+                    .getPublicUrl('prescription/${file.name}'),
+              )
+              .toList();
 
       return urls;
     } catch (e) {
@@ -103,76 +106,84 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    // Simply show the message without resetting _showReports
                     return const Center(child: Text('No reports found.'));
                   } else {
-                    // Display all images
                     return Column(
                       children:
-                          snapshot.data!.map((url) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  url,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      height: 200,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.broken_image,
-                                              size: 50,
-                                              color: Colors.grey,
+                          snapshot.data!
+                              .map(
+                                (url) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 16.0),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      url,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Container(
+                                          height: 200,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(
+                                              8,
                                             ),
-                                            SizedBox(height: 8),
-                                            Text(
-                                              'Failed to load image',
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                              ),
+                                          ),
+                                          child: const Center(
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.broken_image,
+                                                  size: 50,
+                                                  color: Colors.grey,
+                                                ),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  'Failed to load image',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  loadingBuilder: (
-                                    context,
-                                    child,
-                                    loadingProgress,
-                                  ) {
-                                    if (loadingProgress == null) return child;
-                                    return Container(
-                                      height: 200,
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          value:
-                                              loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      loadingProgress
-                                                          .expectedTotalBytes!
-                                                  : null,
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                          ),
+                                        );
+                                      },
+                                      loadingBuilder: (
+                                        context,
+                                        child,
+                                        loadingProgress,
+                                      ) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Container(
+                                          height: 200,
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              value:
+                                                  loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                      : null,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              )
+                              .toList(),
                     );
                   }
                 },
@@ -194,7 +205,17 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: ActionTile(title: 'Take Appointment', onTap: () {}),
+                  child: ActionTile(
+                    title: 'Take Appointment',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const TakeAppointmentPage(),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
