@@ -29,12 +29,9 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   appwrite: ^18.0.0
-<<<<<<< HEAD
   camera: ^0.11.2
-=======
   color: ^3.0.0
   file_picker: ^10.3.2
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   firebase_auth: ^6.0.1
   firebase_core: ^4.0.0
   flutter:
@@ -42,25 +39,17 @@ dependencies:
   flutter_dotenv: ^6.0.0
   flutter_signin_button: ^2.1.1
   flutter_tts: ^4.2.3
-<<<<<<< HEAD
   google_mlkit_text_recognition: ^0.15.0
   google_sign_in: ^6.1.6
   http: ^1.5.0
-=======
-  google_sign_in: ^6.1.6
   image: ^4.5.4
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   image_picker: ^1.2.0
   provider: ^6.1.5+1
   speech_to_text: ^7.3.0
   supabase_flutter: ^2.10.0
   syncfusion_flutter_charts: ^30.2.7
-<<<<<<< HEAD
-  url_launcher: ^6.3.2
-=======
   tflite_flutter: ^0.11.0
   video_player: ^2.10.0
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
 
 dev_dependencies:
   flutter_test:
@@ -96,6 +85,9 @@ flutter:
     - assets/images/government.png
     - assets/models/model_unquant.tflite
     - assets/labels/labels.txt
+    - assets/images/duedate.png
+    - assets/images/ovulation.png
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

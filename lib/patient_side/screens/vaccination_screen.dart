@@ -1,24 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Vaccination Guide',
-      theme: ThemeData(primarySwatch: Colors.orange),
-      home: VaccinationPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
 class VaccinationPage extends StatelessWidget {
-  final List<Map<String, String>> vaccinations = [
+  const VaccinationPage({super.key});
+
+  static const List<Map<String, String>> vaccinations = [
     {
       'month': 'Month 1',
       'name': 'Hepatitis B (1st dose)',
@@ -109,19 +95,20 @@ class VaccinationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange.shade100,
+      backgroundColor: Colors.white, // Changed to white
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.blue.shade900),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+          ), // Changed to white
+          onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
-          'Pregnancy Vaccination Guide',
-          style: TextStyle(color: Colors.blue.shade900),
+        title: const Text(
+          'Vaccination Guide',
+          style: TextStyle(color: Colors.white), // Changed to white
         ),
-        backgroundColor: Colors.orange.shade100,
+        backgroundColor: Colors.black, // Changed to black
         elevation: 0,
       ),
       body: Padding(
@@ -131,16 +118,16 @@ class VaccinationPage extends StatelessWidget {
           itemBuilder: (context, index) {
             final v = vaccinations[index];
             return Card(
-              margin: EdgeInsets.symmetric(vertical: 10),
+              margin: const EdgeInsets.symmetric(vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-              elevation: 5,
-              color: Colors.white.withOpacity(0.9),
+              elevation: 2,
+              color: Colors.white,
               child: ExpansionTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.orange.shade200,
-                  child: Icon(Icons.vaccines, color: Colors.orange[900]),
+                  backgroundColor: Colors.black,
+                  child: Icon(Icons.vaccines, color: Colors.white),
                 ),
                 title: Text(
                   '${v['name']} (${v['month']})',
@@ -157,13 +144,13 @@ class VaccinationPage extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(15), // Curved box
+                      borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -178,7 +165,7 @@ class VaccinationPage extends StatelessWidget {
                               color: Colors.blue.shade900,
                             ),
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                 text: "Description: ",
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
@@ -186,7 +173,7 @@ class VaccinationPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         RichText(
                           text: TextSpan(
                             style: TextStyle(
@@ -194,7 +181,7 @@ class VaccinationPage extends StatelessWidget {
                               color: Colors.blue.shade900,
                             ),
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                 text: "Cause: ",
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
@@ -202,7 +189,7 @@ class VaccinationPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         RichText(
                           text: TextSpan(
                             style: TextStyle(
@@ -210,7 +197,7 @@ class VaccinationPage extends StatelessWidget {
                               color: Colors.blue.shade900,
                             ),
                             children: [
-                              TextSpan(
+                              const TextSpan(
                                 text: "Prevention: ",
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
@@ -218,23 +205,20 @@ class VaccinationPage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         Center(
                           child: ElevatedButton.icon(
                             onPressed: () async {
-                              // Send a normal SMS message to the patient
                               final msg =
                                   'Reminder: ${v['name']} is scheduled for ${v['month']}.';
                               sendSMS(context, msg);
-
-                              // Show a confirmation message
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text('Reminder sent successfully!'),
                                 ),
                               );
                             },
-                            icon: Icon(Icons.alarm),
+                            icon: const Icon(Icons.alarm),
                             label: Text(
                               'Remind Me',
                               style: TextStyle(color: Colors.orange[900]),
@@ -242,7 +226,7 @@ class VaccinationPage extends StatelessWidget {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange.shade100,
                               foregroundColor: Colors.orange[900],
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 10,
                               ),

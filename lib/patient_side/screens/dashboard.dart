@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
-<<<<<<< HEAD
+import 'package:maternalhealthcare/patient_side/screens/babypositiondetection.dart';
 import 'package:provider/provider.dart';
-import 'vitals_monitoring_screen.dart'; // ** CHANGE: Import the correct screen **
-=======
-import 'package:maternalhealthcare/patient_side/widgets/action_card.dart';
-import 'package:maternalhealthcare/patient_side/widgets/monitoring_card.dart';
-import 'package:provider/provider.dart';
-import 'maternaldashboard.dart';
-import 'ml.dart';
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
+import 'vitals_monitoring_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -38,7 +31,6 @@ class DashboardScreen extends StatelessWidget {
                 UnifiedCard(
                   title: 'Vitals Monitoring',
                   isLoading: patientData.isVitalsLoading,
-<<<<<<< HEAD
                   dataWidgets:
                       patientData.vitals
                           .map(
@@ -55,15 +47,6 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                   cardType: CardType.monitoring,
-=======
-                  onRefresh: () => patientData.fetchVitals(),
-                  dataWidgets: patientData.vitals
-                      .map(
-                        (vital) =>
-                            DataChip(label: vital.name, value: vital.value),
-                      )
-                      .toList(),
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
                 ),
                 const SizedBox(height: 8),
 
@@ -71,7 +54,6 @@ class DashboardScreen extends StatelessWidget {
                 UnifiedCard(
                   title: 'Fetal Monitoring',
                   isLoading: patientData.isFetalDataLoading,
-<<<<<<< HEAD
                   dataWidgets:
                       patientData.fetalData
                           .map(
@@ -83,64 +65,22 @@ class DashboardScreen extends StatelessWidget {
                     // TODO: Navigate to FetalMonitoringScreen when it's built
                   },
                   cardType: CardType.monitoring,
-=======
-                  onRefresh: () => patientData.fetchFetalData(),
-                  dataWidgets: patientData.fetalData
-                      .map(
-                        (data) =>
-                            DataChip(label: data.name, value: data.value),
-                      )
-                      .toList(),
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
                 ),
                 const SizedBox(height: 8),
-
-<<<<<<< HEAD
-                // Fetal Position Detection Card (example navigation)
                 UnifiedCard(
-                  title: 'Fetal Position Detection',
-                  buttonText: 'Analyze Position',
+                  title: 'Baby Head Classification',
+                  buttonText: 'Classify Head',
                   onTap: () {
-                    // TODO: Navigate to FetalPositionScreen when it's built
-                  },
-                  cardType: CardType.action,
-=======
-                // Action cards with navigation
-                ActionCard(
-                  title: 'Monitor Vitals',
-                  buttonText: 'Analyze Position',
-                  onButtonPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>  ECGMonitorApp(),
+                        builder: (context) => const BabyHeadClassifier(),
                       ),
                     );
-                  },
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
-                ),
-                const SizedBox(height: 8),
-
-                // Ultrasound Report Analysis Card (example navigation)
-                UnifiedCard(
-                  title: 'Ultrasound Report Analysis',
-                  buttonText: 'Upload & Analyze',
-<<<<<<< HEAD
-                  onTap: () {
-                    // TODO: Navigate to UltrasoundAnalysisScreen when it's built
                   },
                   cardType: CardType.action,
-=======
-                  onButtonPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BabyHeadClassifier(),
-                      ),
-                    );
-                  },
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
                 ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -268,4 +208,3 @@ class DataChip extends StatelessWidget {
     );
   }
 }
-

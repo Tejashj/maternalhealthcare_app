@@ -41,8 +41,9 @@ class _BabyHeadClassifierState extends State<BabyHeadClassifier> {
 
   Future<void> _loadModel() async {
     try {
-      _interpreter =
-          await Interpreter.fromAsset('assets/models/model_unquant.tflite');
+      _interpreter = await Interpreter.fromAsset(
+        'assets/models/model_unquant.tflite',
+      );
       _labels = await _loadLabels('assets/labels/labels.txt');
       setState(() {
         _result = "Model Loaded Successfully!";
@@ -61,7 +62,7 @@ class _BabyHeadClassifierState extends State<BabyHeadClassifier> {
       return data.split('\n').map((e) => e.trim()).toList();
     } catch (e) {
       print("Error loading labels: $e");
-      return ["Ideal Position", "Breech Position","junk"];
+      return ["Ideal Position", "Breech Position", "junk"];
     }
   }
 
@@ -78,35 +79,38 @@ class _BabyHeadClassifierState extends State<BabyHeadClassifier> {
 
   // Safe preprocessing to 4D tensor [1, height, width, 3]
   List<List<List<List<double>>>> _preprocessImage(File imageFile) {
-  final bytes = imageFile.readAsBytesSync();
-  img.Image? image = img.decodeImage(bytes);
-  if (image == null) throw Exception("Cannot decode image");
+    final bytes = imageFile.readAsBytesSync();
+    img.Image? image = img.decodeImage(bytes);
+    if (image == null) throw Exception("Cannot decode image");
 
-  final inputShape = _interpreter!.getInputTensor(0).shape;
-  final inputHeight = inputShape[1];
-  final inputWidth = inputShape[2];
+    final inputShape = _interpreter!.getInputTensor(0).shape;
+    final inputHeight = inputShape[1];
+    final inputWidth = inputShape[2];
 
-  final resized = img.copyResize(image, width: inputWidth, height: inputHeight);
-  final imageBytes = resized.getBytes(); // RGBA bytes
+    final resized = img.copyResize(
+      image,
+      width: inputWidth,
+      height: inputHeight,
+    );
+    final imageBytes = resized.getBytes(); // RGBA bytes
 
-  return [
-    List.generate(inputHeight, (y) {
-      return List.generate(inputWidth, (x) {
-        int baseIndex = (y * resized.width + x) * 4;
-        // Safety check: make sure we don’t go out of bounds
-        if (baseIndex + 2 >= imageBytes.length) {
-          return [0.0, 0.0, 0.0]; // fallback black pixel
-        }
-        return [
-          imageBytes[baseIndex] / 255.0,       // R
-          imageBytes[baseIndex + 1] / 255.0,   // G
-          imageBytes[baseIndex + 2] / 255.0,   // B
-        ];
-      });
-    }),
-  ];
-}
-
+    return [
+      List.generate(inputHeight, (y) {
+        return List.generate(inputWidth, (x) {
+          int baseIndex = (y * resized.width + x) * 4;
+          // Safety check: make sure we don’t go out of bounds
+          if (baseIndex + 2 >= imageBytes.length) {
+            return [0.0, 0.0, 0.0]; // fallback black pixel
+          }
+          return [
+            imageBytes[baseIndex] / 255.0, // R
+            imageBytes[baseIndex + 1] / 255.0, // G
+            imageBytes[baseIndex + 2] / 255.0, // B
+          ];
+        });
+      }),
+    ];
+  }
 
   Future<void> _runModel(File image) async {
     if (_interpreter == null) return;
@@ -115,8 +119,10 @@ class _BabyHeadClassifierState extends State<BabyHeadClassifier> {
       final input = _preprocessImage(image);
 
       final outputShape = _interpreter!.getOutputTensor(0).shape;
-      final output = List.generate(outputShape[0],
-          (_) => List.generate(outputShape[1], (_) => 0.0));
+      final output = List.generate(
+        outputShape[0],
+        (_) => List.generate(outputShape[1], (_) => 0.0),
+      );
 
       print("Input tensor shape: ${_interpreter!.getInputTensor(0).shape}");
       print("Output tensor shape: ${_interpreter!.getOutputTensor(0).shape}");
@@ -141,10 +147,14 @@ class _BabyHeadClassifierState extends State<BabyHeadClassifier> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultPage(
-            prediction: _labels[predictedIndex],
-            videos: predictedIndex == 0 ? _idealPositionVideos : _breechPositionVideos,
-          ),
+          builder:
+              (context) => ResultPage(
+                prediction: _labels[predictedIndex],
+                videos:
+                    predictedIndex == 0
+                        ? _idealPositionVideos
+                        : _breechPositionVideos,
+              ),
         ),
       );
     } catch (e) {
@@ -158,9 +168,7 @@ class _BabyHeadClassifierState extends State<BabyHeadClassifier> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Baby Head Position Detector"),
-      ),
+      appBar: AppBar(title: const Text("Baby Head Position Detector")),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -206,24 +214,24 @@ class _ResultPageState extends State<ResultPage> {
   void _playVideo(String videoPath) {
     _videoController?.dispose();
     _videoController = VideoPlayerController.asset(videoPath)
-      ..initialize().then((_) {
-        print("Video initialized successfully: $videoPath");
-        setState(() {});
-        _videoController!.play();
-      }).catchError((error) {
-        print("Error initializing video: $error");
-        setState(() {
-          _selectedVideoIndex = -1;
-        });
-      });
+      ..initialize()
+          .then((_) {
+            print("Video initialized successfully: $videoPath");
+            setState(() {});
+            _videoController!.play();
+          })
+          .catchError((error) {
+            print("Error initializing video: $error");
+            setState(() {
+              _selectedVideoIndex = -1;
+            });
+          });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Prediction Result"),
-      ),
+      appBar: AppBar(title: const Text("Prediction Result")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

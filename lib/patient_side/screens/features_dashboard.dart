@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maternalhealthcare/auth/profile.dart';
 import 'package:maternalhealthcare/doc_prescription/first_page.dart';
 import 'package:maternalhealthcare/patient_side/screens/diet_screen.dart';
+import 'package:maternalhealthcare/patient_side/screens/vaccination_screen.dart';
 import '../widgets/feature_button.dart';
 import 'package:maternalhealthcare/duedate.dart';
 import 'package:maternalhealthcare/ovulation.dart';
@@ -67,12 +68,13 @@ class FeaturesDashboardScreen extends StatelessWidget {
             const SizedBox(height: 12),
             FeatureButton(
               title: 'Calculate Due Date',
-              imagePath:
-                  'assets/images/prescription.png', // Add your image path
+              imagePath: 'assets/images/duedate.png',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const DueDateCalculator()),
+                  MaterialPageRoute(
+                    builder: (context) => const DueDateCalculator(),
+                  ),
                 );
               },
             ),
@@ -83,7 +85,9 @@ class FeaturesDashboardScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                  MaterialPageRoute(
+                    builder: (context) => const VaccinationPage(),
+                  ),
                 );
               },
             ),
@@ -101,11 +105,13 @@ class FeaturesDashboardScreen extends StatelessWidget {
             const SizedBox(height: 12),
             FeatureButton(
               title: 'Ovulation & Cycle Tracker',
-              imagePath: 'assets/images/government.png', // Add your image path
+              imagePath: 'assets/images/ovulation.png',
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const OvulationCalculatorPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const OvulationCalculatorPage(),
+                  ),
                 );
               },
             ),

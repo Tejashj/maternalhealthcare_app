@@ -241,8 +241,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
-<<<<<<< HEAD
-=======
   file_picker:
     dependency: "direct main"
     description:
@@ -251,7 +249,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "10.3.2"
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   file_selector_linux:
     dependency: transitive
     description:
@@ -412,89 +409,6 @@ packages:
     source: hosted
     version: "10.9.1"
   functions_client:
-<<<<<<< HEAD
-=======
-    dependency: transitive
-    description:
-      name: functions_client
-      sha256: "38e5049d4ca5b3482c606d8bfe82183aa24c9650ef1fa0582ab5957a947b937f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.4"
-  google_identity_services_web:
-    dependency: transitive
-    description:
-      name: google_identity_services_web
-      sha256: "5d187c46dc59e02646e10fe82665fc3884a9b71bc1c90c2b8b749316d33ee454"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.3+1"
-  google_sign_in:
-    dependency: "direct main"
-    description:
-      name: google_sign_in
-      sha256: d0a2c3bcb06e607bb11e4daca48bd4b6120f0bbc4015ccebbe757d24ea60ed2a
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.0"
-  google_sign_in_android:
-    dependency: transitive
-    description:
-      name: google_sign_in_android
-      sha256: d5e23c56a4b84b6427552f1cf3f98f716db3b1d1a647f16b96dbb5b93afa2805
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.2.1"
-  google_sign_in_ios:
-    dependency: transitive
-    description:
-      name: google_sign_in_ios
-      sha256: "102005f498ce18442e7158f6791033bbc15ad2dcc0afa4cf4752e2722a516c96"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.9.0"
-  google_sign_in_platform_interface:
-    dependency: transitive
-    description:
-      name: google_sign_in_platform_interface
-      sha256: "5f6f79cf139c197261adb6ac024577518ae48fdff8e53205c5373b5f6430a8aa"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.0"
-  google_sign_in_web:
-    dependency: transitive
-    description:
-      name: google_sign_in_web
-      sha256: "460547beb4962b7623ac0fb8122d6b8268c951cf0b646dd150d60498430e4ded"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.12.4+4"
-  gotrue:
-    dependency: transitive
-    description:
-      name: gotrue
-      sha256: "4ed944bfa31cca12e6d224ed07557ccf1bb604959de3c7d5282cd11314e7655b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.14.0"
-  gtk:
-    dependency: transitive
-    description:
-      name: gtk
-      sha256: e8ce9ca4b1df106e4d72dad201d345ea1a036cc12c360f1a7d5a758f78ffa42c
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
-  html:
-    dependency: transitive
-    description:
-      name: html
-      sha256: "6d1264f2dffa1b1101c25a91dff0dc2daee4c18e87cd8538729773c073dbf602"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.15.6"
-  http:
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
     dependency: transitive
     description:
       name: functions_client
@@ -582,6 +496,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      sha256: "6d1264f2dffa1b1101c25a91dff0dc2daee4c18e87cd8538729773c073dbf602"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.15.6"
   http:
     dependency: "direct main"
     description:
@@ -598,8 +520,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
-<<<<<<< HEAD
-=======
   image:
     dependency: "direct main"
     description:
@@ -608,7 +528,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.5.4"
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   image_picker:
     dependency: "direct main"
     description:
@@ -701,26 +620,26 @@ packages:
     dependency: transitive
     description:
       name: leak_tracker
-      sha256: "8dcda04c3fc16c14f48a7bb586d4be1f0d1572731b6d81d51772ef47c02081e0"
+      sha256: "6bb818ecbdffe216e81182c2f0714a2e62b593f4a4f13098713ff1685dfb6ab0"
       url: "https://pub.dev"
     source: hosted
-    version: "11.0.1"
+    version: "10.0.9"
   leak_tracker_flutter_testing:
     dependency: transitive
     description:
       name: leak_tracker_flutter_testing
-      sha256: "1dbc140bb5a23c75ea9c4811222756104fbcd1a27173f0c34ca01e16bea473c1"
+      sha256: f8b613e7e6a13ec79cfdc0e97638fddb3ab848452eff057653abd3edba760573
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.10"
+    version: "3.0.9"
   leak_tracker_testing:
     dependency: transitive
     description:
       name: leak_tracker_testing
-      sha256: "8d5a2d49f4a66b49744b23b018848400d23e54caf9463f4eb20df3eb8acb2eb1"
+      sha256: "6ba465d5d76e67ddf503e1161d1f4a6bc42306f9d66ca1e8f079a47290fb06d3"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.2"
+    version: "3.0.1"
   lints:
     dependency: transitive
     description:
@@ -857,8 +776,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.11.1"
-<<<<<<< HEAD
-=======
   petitparser:
     dependency: transitive
     description:
@@ -867,7 +784,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   platform:
     dependency: transitive
     description:
@@ -884,8 +800,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
-<<<<<<< HEAD
-=======
   posix:
     dependency: transitive
     description:
@@ -894,7 +808,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.3"
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   postgrest:
     dependency: transitive
     description:
@@ -911,8 +824,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.5+1"
-<<<<<<< HEAD
-=======
   quiver:
     dependency: transitive
     description:
@@ -921,7 +832,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   realtime_client:
     dependency: transitive
     description:
@@ -1123,10 +1033,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "522f00f556e73044315fa4585ec3270f1808a4b186c936e612cab0b565ff1e00"
+      sha256: fb31f383e2ee25fbbfe06b40fe21e1e458d14080e3c67e7ba0acfde4df4e0bbd
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.6"
+    version: "0.7.4"
   tflite_flutter:
     dependency: "direct main"
     description:
@@ -1152,7 +1062,7 @@ packages:
     source: hosted
     version: "2.2.2"
   url_launcher:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: url_launcher
       sha256: f6a7e5c4835bb4e3026a04793a4199ca2d14c739ec378fdfe23fc8075d0439f8
@@ -1219,10 +1129,10 @@ packages:
     dependency: transitive
     description:
       name: vector_math
-      sha256: d530bd74fea330e6e364cda7a85019c434070188383e1cd8d9777ee586914c5b
+      sha256: "80b3257d1492ce4d091729e3a67a60407d227c27241d6927be0130c98e741803"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.1.4"
   video_player:
     dependency: "direct main"
     description:
@@ -1327,8 +1237,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-<<<<<<< HEAD
-=======
   xml:
     dependency: transitive
     description:
@@ -1337,7 +1245,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.1"
->>>>>>> 60691156e50e6c806e00c5c3aced58897cd56670
   yet_another_json_isolate:
     dependency: transitive
     description:
