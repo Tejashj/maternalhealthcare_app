@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:maternalhealthcare/config/appwrite_client.dart';
 import 'package:maternalhealthcare/doctor_side/provider/doctor_provider.dart';
 import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
-import 'package:maternalhealthcare/role_selection.dart';
+import 'package:maternalhealthcare/utils/role_selection.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';

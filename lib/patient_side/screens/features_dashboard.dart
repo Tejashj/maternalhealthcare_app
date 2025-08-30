@@ -6,8 +6,8 @@ import 'package:maternalhealthcare/patient_side/screens/lib_and_relax.dart';
 import 'diet_screen.dart';
 import 'vaccination_screen.dart';
 import '../widgets/feature_button.dart';
-import 'package:maternalhealthcare/duedate.dart';
-import 'package:maternalhealthcare/ovulation.dart';
+import 'package:maternalhealthcare/patient_side/screens/duedate.dart';
+import 'package:maternalhealthcare/patient_side/screens/ovulation.dart';
 
 class FeaturesDashboardScreen extends StatelessWidget {
   const FeaturesDashboardScreen({super.key});
