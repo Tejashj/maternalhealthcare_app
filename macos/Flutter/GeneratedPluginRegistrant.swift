@@ -5,6 +5,14 @@
 import FlutterMacOS
 import Foundation
 
+<<<<<<< HEAD
+import flutter_blue_plus_darwin
+import reactive_ble_mobile
+
+func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  FlutterBluePlusPlugin.register(with: registry.registrar(forPlugin: "FlutterBluePlusPlugin"))
+  ReactiveBlePlugin.register(with: registry.registrar(forPlugin: "ReactiveBlePlugin"))
+=======
 import app_links
 import desktop_webview_window
 import device_info_plus
@@ -35,4 +43,5 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   SpeechToTextPlugin.register(with: registry.registrar(forPlugin: "SpeechToTextPlugin"))
   UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
   WindowToFrontPlugin.register(with: registry.registrar(forPlugin: "WindowToFrontPlugin"))
+>>>>>>> a57a1d571e4bf2c5211739591e487dd0cec7da60
 }
