@@ -30,26 +30,42 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black, // Black background
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_outlined),
-            activeIcon: Icon(Icons.grid_view_rounded),
+            icon: Icon(
+              Icons.grid_view_outlined,
+              color: Colors.white,
+            ), // White icon
+            activeIcon: Icon(
+              Icons.grid_view_rounded,
+              color: Colors.white,
+            ), // White active icon
             label: 'Patients',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            activeIcon: Icon(Icons.calendar_today_rounded),
+            icon: Icon(
+              Icons.calendar_today_outlined,
+              color: Colors.white,
+            ), // White icon
+            activeIcon: Icon(
+              Icons.calendar_today_rounded,
+              color: Colors.white,
+            ), // White active icon
             label: 'Appointments',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person_rounded),
+            icon: Icon(Icons.person_outline, color: Colors.white), // White icon
+            activeIcon: Icon(
+              Icons.person_rounded,
+              color: Colors.white,
+            ), // White active icon
             label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.teal,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.white, // White selected label
+        unselectedItemColor: Colors.grey[400], // Light grey unselected label
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),

@@ -22,35 +22,39 @@ class _PatientDietScreenState extends State<PatientDietScreen>
   bool _isTyping = false;
   final FlutterTts _flutterTts = FlutterTts();
   bool _showEducationContent = true;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+
+  // Card interactions
+  bool _isNutritionExpanded = false;
+  bool _isExerciseExpanded = false;
+  late AnimationController _nutritionController;
+  late AnimationController _exerciseController;
 
   @override
   void initState() {
     super.initState();
     _initializeSpeech();
     _initializeTts();
-    _animationController = AnimationController(
-      duration: Duration(milliseconds: 300),
+
+    _nutritionController = AnimationController(
+      duration: Duration(milliseconds: 600),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    _exerciseController = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
     );
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _nutritionController.dispose();
+    _exerciseController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   void _initializeSpeech() async {
-    bool available = await _speech.initialize();
-    if (!available) {
-      print("Speech recognition not available on this device.");
-    }
+    await _speech.initialize();
   }
 
   void _initializeTts() async {
@@ -87,7 +91,6 @@ class _PatientDietScreenState extends State<PatientDietScreen>
   }
 
   String _getSystemPrompt(String userMessage) {
-    // Check for greetings and casual messages
     List<String> greetings = [
       'hi',
       'hello',
@@ -112,41 +115,23 @@ class _PatientDietScreenState extends State<PatientDietScreen>
       (greeting) =>
           lowerMessage == greeting || lowerMessage.startsWith(greeting),
     )) {
-      return '''You are a pregnancy nutrition and exercise assistant. The user just greeted you. 
-      
-      Respond with a brief, warm greeting (1-2 sentences) and mention that you're here to help with pregnancy nutrition and exercise questions. Don't give long explanations unless asked specific questions.
+      return '''You are a pregnancy nutrition and exercise assistant. Respond with a brief, warm greeting (1-2 sentences) and mention that you're here to help with pregnancy nutrition and exercise questions.
       
       USER MESSAGE: $userMessage''';
     }
 
     if (casual.any((word) => lowerMessage.contains(word)) &&
         lowerMessage.length < 20) {
-      return '''You are a pregnancy nutrition and exercise assistant. The user sent a casual/short message.
-      
-      Respond briefly and naturally (1-2 sentences). Ask how you can help with their pregnancy nutrition or exercise needs.
+      return '''You are a pregnancy nutrition and exercise assistant. Respond briefly and naturally (1-2 sentences). Ask how you can help with their pregnancy nutrition or exercise needs.
       
       USER MESSAGE: $userMessage''';
     }
 
-    return '''You are a specialized pregnancy nutrition and exercise assistant. Follow these guidelines:
-
-RESPONSE STYLE:
-- Be concise and precise - no unnecessary long explanations
-- For specific questions, give direct, actionable answers
-- For complex topics, organize information in bullet points
-- Always emphasize consulting healthcare providers for medical advice
-- Stay focused on pregnancy nutrition and exercise only
-
-EXPERTISE AREAS:
-- Pregnancy nutrition requirements and meal planning
-- Safe exercises during different trimesters  
-- Prenatal vitamins and supplements
-- Food safety during pregnancy
-- Exercise modifications and precautions
+    return '''You are a specialized pregnancy nutrition and exercise assistant. Be concise and precise. For specific questions, give direct, actionable answers. Always emphasize consulting healthcare providers for medical advice. Stay focused on pregnancy nutrition and exercise only.
 
 USER QUESTION: $userMessage
 
-Provide a helpful, precise response. Keep it concise unless the question specifically requires detailed information.''';
+Provide a helpful, precise response.''';
   }
 
   Future<String> getAIResponse(String userMessage) async {
@@ -175,7 +160,7 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
           'temperature': 0.7,
           'topK': 40,
           'topP': 0.95,
-          'maxOutputTokens': 512, // Reduced for more concise responses
+          'maxOutputTokens': 512,
         },
       }),
     );
@@ -224,9 +209,7 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
   }
 
   Widget _buildEducationContent() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
+    return Container(
       margin: EdgeInsets.all(16),
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -247,26 +230,13 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(Icons.menu_book, color: Colors.black, size: 20),
-                  ),
-                  SizedBox(width: 12),
-                  Text(
-                    'Nutrition & Exercise Guide',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
+              Text(
+                'Nutrition & Exercise Guide',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
               IconButton(
                 icon: Icon(Icons.close, color: Colors.grey[600]),
@@ -280,100 +250,170 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
           ),
           SizedBox(height: 20),
 
-          // Nutrition Section
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[300]!, width: 1),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.restaurant, color: Colors.black, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Nutrition Essentials',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+          // Nutrition Card
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isNutritionExpanded = !_isNutritionExpanded;
+              });
+              if (_isNutritionExpanded) {
+                _nutritionController.forward();
+              } else {
+                _nutritionController.reverse();
+              }
+            },
+            child: AnimatedBuilder(
+              animation: _nutritionController,
+              builder: (context, child) {
+                return Transform(
+                  alignment: Alignment.center,
+                  transform:
+                      Matrix4.identity()
+                        ..setEntry(3, 2, 0.001)
+                        ..rotateY(_nutritionController.value * 3.14159),
+                  child: Container(
+                    height: 250,
+                    width: double.infinity,
+                    padding: EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.grey[400]!, width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                SizedBox(height: 12),
-                Text(
-                  '• Prenatal vitamins + 400mcg folic acid daily\n'
-                  '• DHA & ARA for brain development\n'
-                  '• Extra 350-450 calories (2nd & 3rd trimester)\n'
-                  '• Balanced meals: protein, carbs, healthy fats',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    height: 1.5,
+                    child:
+                        _nutritionController.value > 0.5
+                            ? Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()..rotateY(3.14159),
+                              child: Center(
+                                child: Text(
+                                  '• Prenatal vitamins + 400mcg folic acid daily\n\n'
+                                  '• DHA & ARA for brain development\n\n'
+                                  '• Extra 350-450 calories (2nd & 3rd trimester)\n\n'
+                                  '• Balanced meals: protein, carbs, healthy fats',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                    height: 1.5,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                            )
+                            : Center(
+                              child: Text(
+                                'Nutrition\nEssentials',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  height: 1.3,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
-          SizedBox(height: 16),
 
-          // Exercise Section
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[300]!, width: 1),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.fitness_center, color: Colors.black, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Safe Exercise Tips',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+          SizedBox(height: 20),
+
+          // Exercise Card
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isExerciseExpanded = !_isExerciseExpanded;
+              });
+              if (_isExerciseExpanded) {
+                _exerciseController.forward();
+              } else {
+                _exerciseController.reverse();
+              }
+            },
+            child: AnimatedBuilder(
+              animation: _exerciseController,
+              builder: (context, child) {
+                return Transform(
+                  alignment: Alignment.center,
+                  transform:
+                      Matrix4.identity()
+                        ..setEntry(3, 2, 0.001)
+                        ..rotateY(_exerciseController.value * 3.14159),
+                  child: Container(
+                    height: 250,
+                    width: double.infinity,
+                    padding: EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(color: Colors.grey[400]!, width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                SizedBox(height: 12),
-                Text(
-                  '• Walking, swimming, prenatal yoga, Pilates\n'
-                  '• Start with 5-10 minutes daily\n'
-                  '• Stay hydrated, avoid jarring movements\n'
-                  '• Listen to your body, consult your doctor',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    height: 1.5,
+                    child:
+                        _exerciseController.value > 0.5
+                            ? Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()..rotateY(3.14159),
+                              child: Center(
+                                child: Text(
+                                  '• Walking, swimming, prenatal yoga, Pilates\n\n'
+                                  '• Start with 5-10 minutes daily\n\n'
+                                  '• Stay hydrated, avoid jarring movements\n\n'
+                                  '• Listen to your body, consult your doctor',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                    height: 1.5,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                            )
+                            : Center(
+                              child: Text(
+                                'Safe Exercise\nTips',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  height: 1.3,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
-          SizedBox(height: 16),
+
+          SizedBox(height: 20),
 
           Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: Colors.orange[50],
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey[300]!, width: 1),
+              border: Border.all(color: Colors.orange[300]!, width: 1),
             ),
             child: Row(
               children: [
-                Icon(Icons.warning_amber, color: Colors.orange[600], size: 20),
+                Text('⚠️', style: TextStyle(fontSize: 16)),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -381,7 +421,7 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey[800],
+                      color: Colors.orange[800],
                     ),
                   ),
                 ),
@@ -395,19 +435,18 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
 
   Widget _buildTypingIndicator() {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 4),
+      margin: EdgeInsets.symmetric(vertical: 8),
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: Colors.grey[200],
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey[300]!, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 20,
-            height: 20,
+            width: 16,
+            height: 16,
             child: CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.grey[600]!),
@@ -426,7 +465,7 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(
           'Pregnancy Assistant',
@@ -454,207 +493,199 @@ Provide a helpful, precise response. Keep it concise unless the question specifi
             ),
         ],
       ),
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            if (_showEducationContent) _buildEducationContent(),
-            Expanded(
-              child:
-                  messages.isEmpty
-                      ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.chat_bubble_outline,
-                                size: 50,
-                                color: Colors.grey[600],
-                              ),
+      body: Column(
+        children: [
+          if (_showEducationContent) _buildEducationContent(),
+          Expanded(
+            child:
+                messages.isEmpty
+                    ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
                             ),
-                            SizedBox(height: 20),
-                            Text(
-                              'Ask about pregnancy nutrition\nand exercise!',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w500,
-                                height: 1.3,
-                              ),
+                            child: Icon(
+                              Icons.chat_bubble_outline,
+                              size: 50,
+                              color: Colors.grey[600],
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Try: "What should I eat in first trimester?"',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[500],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                      : ListView.builder(
-                        controller: _scrollController,
-                        padding: EdgeInsets.all(16),
-                        itemCount: messages.length + (_isTyping ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (_isTyping && index == messages.length) {
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              child: _buildTypingIndicator(),
-                            );
-                          }
-
-                          final message = messages[index];
-                          bool isUser = message["role"] == "user";
-
-                          return FadeTransition(
-                            opacity: _fadeAnimation,
-                            child: Align(
-                              alignment:
-                                  isUser
-                                      ? Alignment.centerRight
-                                      : Alignment.centerLeft,
-                              child: Container(
-                                margin: EdgeInsets.symmetric(vertical: 6),
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                constraints: BoxConstraints(
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * 0.8,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      isUser ? Colors.white : Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: Colors.black,
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 6,
-                                      offset: Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Text(
-                                  message["message"]!,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-            ),
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  top: BorderSide(color: Colors.grey[300]!, width: 1),
-                ),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: Colors.grey[300]!, width: 1),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: TextField(
-                          controller: _controller,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                            hintText: 'Ask about nutrition or exercise...',
-                            hintStyle: TextStyle(color: Colors.grey[500]),
-                            border: InputBorder.none,
                           ),
-                          onSubmitted: (text) {
-                            if (text.isNotEmpty) {
-                              sendMessage(text);
-                              _controller.clear();
-                            }
-                          },
-                        ),
+                          SizedBox(height: 20),
+                          Text(
+                            'Ask about pregnancy nutrition\nand exercise!',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                              height: 1.3,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            'Try: "What should I eat in first trimester?"',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
                       ),
+                    )
+                    : ListView.builder(
+                      controller: _scrollController,
+                      padding: EdgeInsets.all(16),
+                      itemCount: messages.length + (_isTyping ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (_isTyping && index == messages.length) {
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: _buildTypingIndicator(),
+                          );
+                        }
+
+                        final message = messages[index];
+                        bool isUser = message["role"] == "user";
+
+                        return Align(
+                          alignment:
+                              isUser
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: 6),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isUser ? Colors.blue[100] : Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color:
+                                    isUser
+                                        ? Colors.blue[300]!
+                                        : Colors.grey[300]!,
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              message["message"]!,
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 16,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    Container(
-                      margin: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.send, color: Colors.black),
-                        onPressed: () {
-                          if (_controller.text.isNotEmpty) {
-                            sendMessage(_controller.text);
+          ),
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(color: Colors.grey[300]!, width: 1),
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: Colors.grey[300]!, width: 1),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        controller: _controller,
+                        style: TextStyle(color: Colors.black87),
+                        decoration: InputDecoration(
+                          hintText: 'Ask about nutrition or exercise...',
+                          hintStyle: TextStyle(color: Colors.grey[500]),
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (text) {
+                          if (text.isNotEmpty) {
+                            sendMessage(text);
                             _controller.clear();
                           }
                         },
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[100],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.send, color: Colors.blue[800]),
+                      onPressed: () {
+                        if (_controller.text.isNotEmpty) {
+                          sendMessage(_controller.text);
+                          _controller.clear();
+                        }
+                      },
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: _isListening ? Colors.red[100] : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        _isListening ? Icons.mic : Icons.mic_off,
                         color:
-                            _isListening
-                                ? Colors.red.withOpacity(0.1)
-                                : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(20),
+                            _isListening ? Colors.red[700] : Colors.grey[700],
                       ),
-                      child: IconButton(
-                        icon: Icon(
-                          _isListening ? Icons.mic : Icons.mic_off,
-                          color: _isListening ? Colors.red : Colors.black,
-                        ),
-                        onPressed: () {
-                          if (_isListening) {
-                            _stopListening();
-                          } else {
-                            _startListening();
-                          }
-                        },
-                      ),
+                      onPressed: () {
+                        if (_isListening) {
+                          _stopListening();
+                        } else {
+                          _startListening();
+                        }
+                      },
                     ),
-                    Container(
-                      margin: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: IconButton(
-                        icon: Icon(Icons.stop, color: Colors.black),
-                        onPressed: _stopTtsAndClearInput,
-                      ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                  ],
-                ),
+                    child: IconButton(
+                      icon: Icon(Icons.stop, color: Colors.grey[700]),
+                      onPressed: _stopTtsAndClearInput,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
