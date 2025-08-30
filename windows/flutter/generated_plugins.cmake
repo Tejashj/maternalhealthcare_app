@@ -3,12 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  app_links
   desktop_webview_window
   firebase_auth
   firebase_core
   flutter_tts
-  speech_to_text_windows
   url_launcher_windows
   window_to_front
 )
