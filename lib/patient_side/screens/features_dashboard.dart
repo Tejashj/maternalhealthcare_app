@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maternalhealthcare/auth/profile.dart';
 import 'package:maternalhealthcare/doc_prescription/first_page.dart';
-import 'package:maternalhealthcare/patient_side/screens/diet_screen.dart';
-import 'package:maternalhealthcare/patient_side/screens/vaccination_screen.dart';
+import 'diet_screen.dart';
+import 'vaccination_screen.dart';
 import '../widgets/feature_button.dart';
 import 'package:maternalhealthcare/duedate.dart';
 import 'package:maternalhealthcare/ovulation.dart';

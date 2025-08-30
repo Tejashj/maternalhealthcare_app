@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
-import 'package:maternalhealthcare/patient_side/screens/babypositiondetection.dart';
+import '../provider/patient_provider.dart';
+import 'babypositiondetection.dart';
 import 'package:provider/provider.dart';
 import 'vitals_monitoring_screen.dart';
 
