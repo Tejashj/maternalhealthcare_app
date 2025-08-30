@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "244926327377",
+    "project_id": "maternal-healthcare-app-20c2c",
+    "storage_bucket": "maternal-healthcare-app-20c2c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244926327377:android:d0c9d052702bdfa303a670",
+        "android_client_info": {
+          "package_name": "com.example.maternalhealthcare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi7FTwxvNWmfHcYoxmY392QOSthmdCNFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
