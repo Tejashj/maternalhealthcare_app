@@ -7,6 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+// Import the new page we will create
+import 'bc_list.dart';
+
 class PatientPage extends StatefulWidget {
   const PatientPage({super.key});
 
@@ -29,6 +32,7 @@ class _PatientPageState extends State<PatientPage> {
   DeployedContract? contract;
   Credentials? credentials;
   String status = "Initializing...";
+  int patientCount = 0;
   bool isLoading = true;
   File? _selectedImage;
 
@@ -54,7 +58,7 @@ class _PatientPageState extends State<PatientPage> {
       ContractAbi.fromJson(abi, "PatientRecords"),
       contractAddr,
     );
-    await getPatientCount(); // Still useful to have an up-to-date internal count
+    await getPatientCount();
     setState(() {
       isLoading = false;
       status = "Connected to Ganache ✅";
@@ -72,12 +76,12 @@ class _PatientPageState extends State<PatientPage> {
       ),
       chainId: 1337, // Ganache default chain ID
     );
-    await getPatientCount(); // Refresh the internal count after adding
+    await getPatientCount(); // Refresh the count after adding
   }
 
-  Future<void> getPatientCount() async {
-    // This function remains to keep the connection status fresh
-    // but the count variable is no longer displayed in the UI.
+  // ✅ MODIFIED: This function now returns the count
+  Future<int> getPatientCount() async {
+    int count = 0;
     try {
       final countFn = contract!.function("patientCount");
       final result = await ethClient.call(
@@ -85,16 +89,39 @@ class _PatientPageState extends State<PatientPage> {
         function: countFn,
         params: [],
       );
-      // Optional: you can remove the patientCount state variable if you want
-      // For now, it just updates silently.
-      if (mounted) {
-        setState(() {
-          // patientCount = (result[0] as BigInt).toInt();
-        });
-      }
+      count = (result[0] as BigInt).toInt();
+      setState(() {
+        patientCount = count;
+      });
     } catch (e) {
       debugPrint("Error getting patient count: $e");
     }
+    return count;
+  }
+
+  // ✅ NEW: This function fetches all patient records from the blockchain
+  Future<List<Map<String, dynamic>>> fetchAllPatients() async {
+    final List<Map<String, dynamic>> patientList = [];
+    final count = await getPatientCount();
+
+    for (var i = 1; i <= count; i++) {
+      try {
+        final result = await ethClient.call(
+          contract: contract!,
+          function: contract!.function("getPatient"),
+          params: [BigInt.from(i)],
+        );
+        patientList.add({
+          'id': i,
+          'name': result[0].toString(),
+          'age': result[1].toString(),
+          'ultrasoundUrl': result[2].toString(),
+        });
+      } catch (e) {
+        debugPrint("Could not fetch patient with ID $i: $e");
+      }
+    }
+    return patientList;
   }
 
   Future<void> _pickImage() async {
@@ -120,7 +147,7 @@ class _PatientPageState extends State<PatientPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(status, // ✅ REMOVED: Patient count display
+                    Text("$status | Total Patients: $patientCount",
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
@@ -200,7 +227,25 @@ class _PatientPageState extends State<PatientPage> {
                       },
                       child: const Text("Submit Patient Record"),
                     ),
-                    // ✅ REMOVED: "View Previous Records" button and related widgets
+
+                    // ✅ NEW: Button to navigate to the view page
+                    const SizedBox(height: 20),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    OutlinedButton.icon(
+                      icon: const Icon(Icons.history),
+                      label: const Text("View Previous Records"),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PatientListPage(
+                              fetchPatients: fetchAllPatients,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

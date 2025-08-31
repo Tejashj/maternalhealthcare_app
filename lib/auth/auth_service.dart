@@ -1,53 +1,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+
+// A simple class to hold user profile data for the AuthWrapper
+class UserProfile {
+  final String uid;
+  final String? fullName;
+  final String role;
+  UserProfile({required this.uid, this.fullName, required this.role});
+}
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Stream for auth state changes (handles automatic persistence)
+  // --- Core Properties ---
   Stream<User?> get authStateChanges => _auth.authStateChanges();
-
-  // Get current user
   User? get currentUser => _auth.currentUser;
 
-  // Google Sign In
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
-      debugPrint("1. Starting Google Sign-In process...");
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  // --- Authentication Methods (Called by UI) ---
 
-      if (googleUser == null) {
-        debugPrint("   -> Google Sign-In was cancelled by the user.");
-        return null;
-      }
-      debugPrint("2. Google account selected: ${googleUser.email}");
-
-      debugPrint("3. Obtaining Google Auth credentials...");
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      debugPrint("   -> Google Auth credentials obtained successfully.");
-
-      debugPrint("4. Creating Firebase credential...");
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      debugPrint("   -> Firebase credential created.");
-
-      debugPrint("5. Signing in to Firebase with credential...");
-      final userCredential = await _auth.signInWithCredential(credential);
-      debugPrint(
-        "✅ Firebase sign-in successful! UID: ${userCredential.user?.uid}",
-      );
-      return userCredential;
-    } catch (e) {
-      debugPrint("❌ ERROR during Google sign-in: $e");
-      return null;
-    }
-  }
-
-  // Phone Number Sign In (Verification part 1)
+  /// Triggers the Firebase phone authentication flow.
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
     required void Function(PhoneAuthCredential) verificationCompleted,
@@ -64,26 +37,79 @@ class AuthService {
     );
   }
 
-  // Sign in with SMS code (Verification part 2)
+  /// Signs the user in with a Firebase credential.
+  Future<UserCredential?> signInWithCredential(
+    AuthCredential credential,
+  ) async {
+    return await _auth.signInWithCredential(credential);
+  }
+
+  /// Signs the user in manually with the OTP code.
   Future<UserCredential?> signInWithSmsCode(
     String verificationId,
     String smsCode,
   ) async {
     try {
-      final AuthCredential credential = PhoneAuthProvider.credential(
+      final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: smsCode,
       );
-      return await _auth.signInWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
-      debugPrint(e.message);
+      return await signInWithCredential(credential);
+    } catch (e) {
+      debugPrint("Error in signInWithSmsCode: $e");
       return null;
     }
   }
 
-  // Sign Out
+  /// Signs the user out from Firebase.
   Future<void> signOut() async {
-    await GoogleSignIn().signOut();
     await _auth.signOut();
+    debugPrint("✅ User signed out from Firebase.");
+  }
+
+  // --- Profile Management Methods ---
+
+  /// Fetches the user's profile from the Firestore 'users' collection.
+  Future<UserProfile?> getUserProfile(String uid) async {
+    try {
+      final docSnapshot = await _firestore.collection('users').doc(uid).get();
+      if (!docSnapshot.exists) {
+        return null; // Profile doesn't exist
+      }
+      final data = docSnapshot.data()!;
+      return UserProfile(
+        uid: uid,
+        fullName: data['fullName'],
+        role: data['role'],
+      );
+    } catch (e) {
+      debugPrint("Error fetching user profile: $e");
+      return null;
+    }
+  }
+
+  /// Creates the patient's profile in Firestore after onboarding.
+  Future<void> createPatientProfile({
+    required String uid,
+    required String phoneNumber,
+    required String fullName,
+    required DateTime dateOfBirth,
+    required double weight,
+    required String selectedDoctorId,
+  }) async {
+    try {
+      await _firestore.collection('users').doc(uid).set({
+        'uid': uid,
+        'phoneNumber': phoneNumber,
+        'fullName': fullName,
+        'dateOfBirth': Timestamp.fromDate(dateOfBirth),
+        'weightKg': weight,
+        'consultingDoctorId': selectedDoctorId,
+        'role': 'patient',
+      });
+    } catch (e) {
+      debugPrint('Error creating patient profile: $e');
+      rethrow;
+    }
   }
 }

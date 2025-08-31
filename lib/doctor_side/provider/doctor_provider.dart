@@ -1,122 +1,105 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-// Mock data models
+// --- Data Models ---
+
+// Represents a patient in the doctor's dashboard list
 class Patient {
   final String id;
-  final String name;
-  Patient({required this.id, required this.name});
-}
+  final String fullName;
+  final String phoneNumber;
 
-class Appointment {
-  final String id;
-  final String patientName;
-  final String date;
-  final String time;
-  Appointment({
+  Patient({
     required this.id,
-    required this.patientName,
-    required this.date,
-    required this.time,
+    required this.fullName,
+    required this.phoneNumber,
   });
+
+  factory Patient.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map<String, dynamic>;
+    return Patient(
+      id: doc.id,
+      fullName: data['fullName'] ?? 'N/A',
+      phoneNumber: data['phoneNumber'] ?? 'N/A',
+    );
+  }
 }
 
+// Represents the logged-in doctor's own profile
 class DoctorProfile {
   final String name;
-  final String licenseId;
+  final String licenseId; // Assuming licenseId is stored in the profile
+
   DoctorProfile({required this.name, required this.licenseId});
+
+  factory DoctorProfile.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map<String, dynamic>;
+    return DoctorProfile(
+      name: data['fullName'] ?? 'Dr. Name Not Found',
+      licenseId:
+          data['licenseId'] ?? 'N/A', // Assumes you have a 'licenseId' field
+    );
+  }
 }
 
 class DoctorDataProvider with ChangeNotifier {
-  // Private state
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // --- State for Patients List ---
   bool _isLoadingPatients = false;
-  bool _isLoadingAppointments = false;
-  bool _isLoadingProfile = false;
-
   List<Patient> _patients = [];
-  List<Appointment> _appointments = [];
-  DoctorProfile? _profile;
-
-  // Getters to expose state to the UI
   bool get isLoadingPatients => _isLoadingPatients;
-  bool get isLoadingAppointments => _isLoadingAppointments;
-  bool get isLoadingProfile => _isLoadingProfile;
-
   List<Patient> get patients => _patients;
-  List<Appointment> get appointments => _appointments;
+
+  // --- State for Doctor's Own Profile ---
+  bool _isLoadingProfile = false;
+  DoctorProfile? _profile;
+  bool get isLoadingProfile => _isLoadingProfile;
   DoctorProfile? get profile => _profile;
 
-  DoctorDataProvider() {
-    // Fetch initial data when the provider is created
-    fetchPatients();
-    fetchAppointments();
-    fetchDoctorProfile();
-  }
-
-  // --- Business Logic ---
-
+  /// Fetches all users with the role 'patient' from Firestore.
   Future<void> fetchPatients() async {
     _isLoadingPatients = true;
     notifyListeners();
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network call
-    _patients = List.generate(
-      8,
-      (i) => Patient(id: '$i', name: 'Patient ${i + 1}'),
-    );
-    _isLoadingPatients = false;
-    notifyListeners();
+
+    try {
+      final snapshot =
+          await _firestore
+              .collection('users')
+              .where('role', isEqualTo: 'patient')
+              .get();
+      _patients =
+          snapshot.docs.map((doc) => Patient.fromFirestore(doc)).toList();
+    } catch (e) {
+      debugPrint("Error fetching patients: $e");
+      _patients = [];
+    } finally {
+      _isLoadingPatients = false;
+      notifyListeners();
+    }
   }
 
-  Future<void> fetchAppointments() async {
-    _isLoadingAppointments = true;
-    notifyListeners();
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network call
-    _appointments = [
-      Appointment(
-        id: '1',
-        patientName: 'Patient 1',
-        date: '25 Aug 2025',
-        time: '10:00 AM',
-      ),
-      Appointment(
-        id: '2',
-        patientName: 'Patient 2',
-        date: '25 Aug 2025',
-        time: '11:30 AM',
-      ),
-      Appointment(
-        id: '3',
-        patientName: 'Patient 3',
-        date: '26 Aug 2025',
-        time: '09:00 AM',
-      ),
-      Appointment(
-        id: '4',
-        patientName: 'Patient 4',
-        date: '26 Aug 2025',
-        time: '12:00 PM',
-      ),
-    ];
-    _isLoadingAppointments = false;
-    notifyListeners();
-  }
-
+  /// Fetches the profile for the currently logged-in doctor.
   Future<void> fetchDoctorProfile() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
     _isLoadingProfile = true;
     notifyListeners();
-    await Future.delayed(
-      const Duration(milliseconds: 500),
-    ); // Simulate network call
-    _profile = DoctorProfile(name: 'Dr. Alex Ray', licenseId: '123456789');
-    _isLoadingProfile = false;
-    notifyListeners();
-  }
 
-  Future<void> cancelAllAppointments() async {
-    _isLoadingAppointments = true;
-    notifyListeners();
-    await Future.delayed(const Duration(seconds: 1)); // Simulate API call
-    _appointments = []; // Clear the list
-    _isLoadingAppointments = false;
-    notifyListeners();
+    try {
+      final docSnapshot =
+          await _firestore.collection('users').doc(user.uid).get();
+      if (docSnapshot.exists) {
+        _profile = DoctorProfile.fromFirestore(docSnapshot);
+      }
+    } catch (e) {
+      debugPrint("Error fetching doctor profile: $e");
+    } finally {
+      _isLoadingProfile = false;
+      notifyListeners();
+    }
   }
 }
