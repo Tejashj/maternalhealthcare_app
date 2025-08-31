@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:maternalhealthcare/patient_side/auth/auth_service.dart';
+import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
 
 class ExistingDoctorLoginScreen extends StatefulWidget {
   const ExistingDoctorLoginScreen({super.key});
@@ -89,8 +90,18 @@ class _ExistingDoctorLoginScreenState extends State<ExistingDoctorLoginScreen> {
 
       if (userCredential == null) {
         _showMessage('Sign in failed. Please check the OTP.', isError: true);
+        return; // Add return here to prevent navigation on failure
       }
-      // AuthWrapper will handle successful navigation automatically.
+
+      // Add navigation after successful sign in
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const DoctorHomeScreen()),
+          (route) => false, // This removes all previous routes from the stack
+        );
+      }
+    } catch (e) {
+      _showMessage('Verification failed: ${e.toString()}', isError: true);
     } finally {
       _setLoading(false);
     }

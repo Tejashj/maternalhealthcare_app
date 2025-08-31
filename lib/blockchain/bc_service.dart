@@ -46,7 +46,7 @@ class _PatientPageState extends State<PatientPage> {
     ethClient = Web3Client(rpcUrl, Client());
     credentials = EthPrivateKey.fromHex(privateKey);
 
-    String _ = '''[
+    String abi = '''[
       { "inputs": [ {"internalType": "string","name": "_name","type": "string"}, {"internalType": "uint256","name": "_age","type": "uint256"}, {"internalType": "string","name": "_ultrasoundHash","type": "string"} ], "name": "addPatient", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
       { "inputs": [{"internalType": "uint256","name": "_id","type": "uint256"}], "name": "getPatient", "outputs": [ {"internalType": "string","name": "","type": "string"}, {"internalType": "uint256","name": "","type": "uint256"}, {"internalType": "string","name": "","type": "string"} ], "stateMutability": "view", "type": "function" },
       { "inputs": [], "name": "patientCount", "outputs": [{"internalType": "uint256","name": "","type": "uint256"}], "stateMutability": "view", "type": "function" },
@@ -139,117 +139,148 @@ class _PatientPageState extends State<PatientPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Add Patient Record")),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text("$status | Total Patients: $patientCount",
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                padding: const EdgeInsets.all(16),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        "$status | Total Patients: $patientCount",
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-                    const Text("➕ Add New Patient",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    TextField(
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "➕ Add New Patient",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextField(
                         controller: nameController,
-                        decoration: const InputDecoration(labelText: "Patient Name")),
-                    TextField(
+                        decoration: const InputDecoration(
+                          labelText: "Patient Name",
+                        ),
+                      ),
+                      TextField(
                         controller: ageController,
-                        decoration: const InputDecoration(labelText: "Patient Age"),
-                        keyboardType: TextInputType.number),
-                    const SizedBox(height: 20),
-                    if (_selectedImage != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.file(_selectedImage!, height: 200, fit: BoxFit.cover),
+                        decoration: const InputDecoration(
+                          labelText: "Patient Age",
+                        ),
+                        keyboardType: TextInputType.number,
                       ),
-                    const SizedBox(height: 10),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.image_search),
-                      label: Text(_selectedImage == null
-                          ? "Select Ultrasound Scan"
-                          : "Change Scan"),
-                      onPressed: _pickImage,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () async {
-                        final age = int.tryParse(ageController.text);
-
-                        if (nameController.text.isEmpty ||
-                            age == null ||
-                            _selectedImage == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text(
-                                  "Please fill all fields and select an image.")));
-                          return;
-                        }
-
-                        setState(() => isLoading = true);
-                        try {
-                          final imageFile = _selectedImage!;
-                          final fileName =
-                              '${DateTime.now().millisecondsSinceEpoch}.jpg';
-                          await Supabase.instance.client.storage
-                              .from('ultrasounds')
-                              .upload(fileName, imageFile);
-
-                          final imageUrl = Supabase.instance.client.storage
-                              .from('ultrasounds')
-                              .getPublicUrl(fileName);
-
-                          await addPatient(nameController.text, age, imageUrl);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    "Success! Patient record and scan saved.")),
-                          );
-
-                          setState(() {
-                            _selectedImage = null;
-                            nameController.clear();
-                            ageController.clear();
-                          });
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Error: $e")),
-                          );
-                        } finally {
-                          setState(() => isLoading = false);
-                        }
-                      },
-                      child: const Text("Submit Patient Record"),
-                    ),
-
-                    // ✅ NEW: Button to navigate to the view page
-                    const SizedBox(height: 20),
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    OutlinedButton.icon(
-                      icon: const Icon(Icons.history),
-                      label: const Text("View Previous Records"),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PatientListPage(
-                              fetchPatients: fetchAllPatients,
-                            ),
+                      const SizedBox(height: 20),
+                      if (_selectedImage != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            _selectedImage!,
+                            height: 200,
+                            fit: BoxFit.cover,
                           ),
-                        );
-                      },
-                    ),
-                  ],
+                        ),
+                      const SizedBox(height: 10),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.image_search),
+                        label: Text(
+                          _selectedImage == null
+                              ? "Select Ultrasound Scan"
+                              : "Change Scan",
+                        ),
+                        onPressed: _pickImage,
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        onPressed: () async {
+                          final age = int.tryParse(ageController.text);
+
+                          if (nameController.text.isEmpty ||
+                              age == null ||
+                              _selectedImage == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Please fill all fields and select an image.",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          setState(() => isLoading = true);
+                          try {
+                            final imageFile = _selectedImage!;
+                            final fileName =
+                                '${DateTime.now().millisecondsSinceEpoch}.jpg';
+                            await Supabase.instance.client.storage
+                                .from('ultrasounds')
+                                .upload(fileName, imageFile);
+
+                            final imageUrl = Supabase.instance.client.storage
+                                .from('ultrasounds')
+                                .getPublicUrl(fileName);
+
+                            await addPatient(
+                              nameController.text,
+                              age,
+                              imageUrl,
+                            );
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Success! Patient record and scan saved.",
+                                ),
+                              ),
+                            );
+
+                            setState(() {
+                              _selectedImage = null;
+                              nameController.clear();
+                              ageController.clear();
+                            });
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error: $e")),
+                            );
+                          } finally {
+                            setState(() => isLoading = false);
+                          }
+                        },
+                        child: const Text("Submit Patient Record"),
+                      ),
+
+                      // ✅ NEW: Button to navigate to the view page
+                      const SizedBox(height: 20),
+                      const Divider(),
+                      const SizedBox(height: 10),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.history),
+                        label: const Text("View Previous Records"),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => PatientListPage(
+                                    fetchPatients: fetchAllPatients,
+                                  ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
     );
   }
 }

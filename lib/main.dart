@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maternalhealthcare/patient_side/auth/authwrapper.dart';
 import 'package:maternalhealthcare/config/firebase_options.dart';
@@ -45,7 +46,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
           scaffoldBackgroundColor: Colors.grey[50],
-          fontFamily: 'Inter',
+          // Apply the 'Inter' font globally using the google_fonts package
+          textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
           cardTheme: CardThemeData(
             elevation: 2,
             shape: RoundedRectangleBorder(
