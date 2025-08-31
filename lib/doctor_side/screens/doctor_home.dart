@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:maternalhealthcare/doctor_side/auth/profile.dart';
 import 'appointments_screen.dart';
-import 'doctor_profile.dart';
 import 'patient_dashboard.dart';
 import 'package:maternalhealthcare/blockchain/bc_service.dart';
 
