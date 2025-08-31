@@ -5,7 +5,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PatientPage extends StatefulWidget {
   const PatientPage({super.key});
@@ -29,7 +29,6 @@ class _PatientPageState extends State<PatientPage> {
   DeployedContract? contract;
   Credentials? credentials;
   String status = "Initializing...";
-  int patientCount = 0;
   bool isLoading = true;
   File? _selectedImage;
 
@@ -55,7 +54,7 @@ class _PatientPageState extends State<PatientPage> {
       ContractAbi.fromJson(abi, "PatientRecords"),
       contractAddr,
     );
-    await getPatientCount();
+    await getPatientCount(); // Still useful to have an up-to-date internal count
     setState(() {
       isLoading = false;
       status = "Connected to Ganache ✅";
@@ -73,10 +72,12 @@ class _PatientPageState extends State<PatientPage> {
       ),
       chainId: 1337, // Ganache default chain ID
     );
-    await getPatientCount(); // Refresh the count after adding
+    await getPatientCount(); // Refresh the internal count after adding
   }
 
   Future<void> getPatientCount() async {
+    // This function remains to keep the connection status fresh
+    // but the count variable is no longer displayed in the UI.
     try {
       final countFn = contract!.function("patientCount");
       final result = await ethClient.call(
@@ -84,9 +85,13 @@ class _PatientPageState extends State<PatientPage> {
         function: countFn,
         params: [],
       );
-      setState(() {
-        patientCount = (result[0] as BigInt).toInt();
-      });
+      // Optional: you can remove the patientCount state variable if you want
+      // For now, it just updates silently.
+      if (mounted) {
+        setState(() {
+          // patientCount = (result[0] as BigInt).toInt();
+        });
+      }
     } catch (e) {
       debugPrint("Error getting patient count: $e");
     }
@@ -115,7 +120,7 @@ class _PatientPageState extends State<PatientPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text("$status | Total Patients: $patientCount",
+                    Text(status, // ✅ REMOVED: Patient count display
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
@@ -161,7 +166,6 @@ class _PatientPageState extends State<PatientPage> {
 
                         setState(() => isLoading = true);
                         try {
-                          // 1. Upload to Supabase
                           final imageFile = _selectedImage!;
                           final fileName =
                               '${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -169,12 +173,10 @@ class _PatientPageState extends State<PatientPage> {
                               .from('ultrasounds')
                               .upload(fileName, imageFile);
 
-                          // 2. Get the public URL
                           final imageUrl = Supabase.instance.client.storage
                               .from('ultrasounds')
                               .getPublicUrl(fileName);
 
-                          // 3. Save the URL to the blockchain
                           await addPatient(nameController.text, age, imageUrl);
 
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -183,7 +185,6 @@ class _PatientPageState extends State<PatientPage> {
                                     "Success! Patient record and scan saved.")),
                           );
 
-                          // Clear the form
                           setState(() {
                             _selectedImage = null;
                             nameController.clear();
@@ -199,6 +200,7 @@ class _PatientPageState extends State<PatientPage> {
                       },
                       child: const Text("Submit Patient Record"),
                     ),
+                    // ✅ REMOVED: "View Previous Records" button and related widgets
                   ],
                 ),
               ),
