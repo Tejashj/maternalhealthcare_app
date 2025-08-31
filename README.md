@@ -1,16 +1,16 @@
-# maternalhealthcare
+The Maternal Health Monitoring App
+It is a mobile-first application designed to address critical gaps in conventional prenatal care. By providing continuous, real-time monitoring of vital signs such as ECG and heart rate, the app offers expectant mothers and their healthcare providers a clearer, more immediate view of maternal well-being between clinic visits.
 
-A new Flutter project.
+At its core, the project leverages blockchain technology to create an immutable and tamper-proof health ledger for each patient. This ensures the utmost integrity and security of medical records. Sensitive files, like ultrasound scans, are securely managed via cloud storage, with only their access links recorded on-chain. This hybrid approach guarantees data integrity, patient privacy, and efficient, accessible record-keeping for authorized medical professionals.
 
-## Getting Started
+Key Features
+Real-time Vital Sign Monitoring: Live visualization of ECG waveforms and continuous BPM (Beats Per Minute) tracking provides immediate health insights directly from a mobile device.
 
-This project is a starting point for a Flutter application.
+Immutable Health Ledger: Patient records are stored on an Ethereum-based blockchain, guaranteeing that once a record is created, it cannot be altered or deleted, providing a single source of truth for a patient's medical history.
 
-A few resources to get you started if this is your first Flutter project:
+Secure Cloud Storage Integration: Medical scans and large files are uploaded to Supabase Storage, ensuring high availability and performance while keeping the blockchain lean and efficient.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Dedicated Doctor's Portal: A professional dashboard allows healthcare providers to securely onboard new patients and access their complete, chronologically-ordered medical history with verifiable integrity.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Privacy-Centric Design: The application is architected with a strong focus on security, utilizing environment variables for all credentials and adhering to best practices for handling sensitive health data.
+
