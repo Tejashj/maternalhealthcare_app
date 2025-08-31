@@ -104,8 +104,15 @@ class _TextRecognitionPageState extends State<TextRecognitionPage> {
     });
 
     try {
-      final String apiKey =
-          'uziKmpzc4aOCI1f2tIiUrjJGkqnPOXXpJHvc4hNv'; // Replace with your Cohere API key
+      // Retrieve the API key from Dart compile-time environment variable
+      final String apiKey = const String.fromEnvironment('COHERE_API_KEY');
+      if (apiKey.isEmpty) {
+        setState(() {
+          _aiResponse = 'API key not found. Please set COHERE_API_KEY.';
+          _isAnalyzing = false;
+        });
+        return;
+      }
       final String endpoint = 'https://api.cohere.ai/v1/generate';
       final response = await http.post(
         Uri.parse(endpoint),
