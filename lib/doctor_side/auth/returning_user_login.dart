@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:maternalhealthcare/doctor_side/auth/auth_service.dart';
-import 'package:maternalhealthcare/doctor_side/auth/onboarding_screen.dart';
-import 'package:maternalhealthcare/doctor_side/auth/returning_user_login.dart';
+import 'package:maternalhealthcare/patient_side/auth/auth_service.dart';
 
-class DoctorLoginScreen extends StatefulWidget {
-  const DoctorLoginScreen({super.key});
+class ExistingDoctorLoginScreen extends StatefulWidget {
+  const ExistingDoctorLoginScreen({super.key});
 
   @override
-  State<DoctorLoginScreen> createState() => _DoctorLoginScreenState();
+  State<ExistingDoctorLoginScreen> createState() =>
+      _ExistingDoctorLoginScreenState();
 }
 
-class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
-  final DoctorAuthService _doctorAuthService = DoctorAuthService();
-
-  final _licenseController = TextEditingController();
+class _ExistingDoctorLoginScreenState extends State<ExistingDoctorLoginScreen> {
+  // NOTE: We use the main AuthService because an existing doctor is just a regular user
+  // in our system. The AuthWrapper will correctly route them based on their 'doctor' role.
+  final AuthService _authService = AuthService();
   final _phoneController = TextEditingController();
   final _smsCodeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -24,7 +23,6 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
 
   @override
   void dispose() {
-    _licenseController.dispose();
     _phoneController.dispose();
     _smsCodeController.dispose();
     super.dispose();
@@ -45,16 +43,21 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
     }
   }
 
-  Future<void> _verifyDoctor() async {
+  Future<void> _sendOtp() async {
     if (!_formKey.currentState!.validate()) return;
     _setLoading(true);
     try {
-      await _doctorAuthService.verifyDoctorAndSendOtp(
-        licenseId: _licenseController.text.trim(),
+      await _authService.verifyPhoneNumber(
         phoneNumber: _phoneController.text.trim(),
         verificationCompleted: (credential) async {
           // Handle auto-verification if it occurs
-          await _claimAndSignIn(credential: credential);
+          final userCredential = await _authService.signInWithCredential(
+            credential,
+          );
+          if (userCredential == null) {
+            _showMessage('Auto-verification failed.', isError: true);
+          }
+          // AuthWrapper will handle navigation
         },
         verificationFailed: (e) {
           _showMessage(e.message ?? 'Verification failed', isError: true);
@@ -65,49 +68,29 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         },
         codeAutoRetrievalTimeout: (verificationId) {},
       );
-    } on FirebaseAuthException catch (e) {
-      _showMessage(e.message ?? 'An error occurred', isError: true);
+    } catch (e) {
+      _showMessage('An error occurred: $e', isError: true);
     } finally {
       _setLoading(false);
     }
   }
 
-  Future<void> _claimAndSignIn({AuthCredential? credential}) async {
-    if (credential == null && _smsCodeController.text.isEmpty) {
-      _showMessage('Please enter the OTP.', isError: true);
-      return;
-    }
+  Future<void> _verifyAndSignIn() async {
+    if (!_formKey.currentState!.validate()) return;
     _setLoading(true);
     try {
-      final authCredential =
-          credential ??
-          PhoneAuthProvider.credential(
-            verificationId: _verificationId!,
-            smsCode: _smsCodeController.text.trim(),
-          );
-
-      final userCredential = await _doctorAuthService.signInWithCredential(
-        authCredential,
+      final credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: _smsCodeController.text.trim(),
+      );
+      final userCredential = await _authService.signInWithCredential(
+        credential,
       );
 
-      if (userCredential?.user != null) {
-        await _doctorAuthService.createDoctorProfile(
-          uid: userCredential!.user!.uid,
-          licenseId: _licenseController.text.trim(),
-          phoneNumber: _phoneController.text.trim(),
-        );
-
-        if (mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const DoctorOnboardingScreen()),
-            (route) => false,
-          );
-        }
-      } else {
+      if (userCredential == null) {
         _showMessage('Sign in failed. Please check the OTP.', isError: true);
       }
-    } catch (e) {
-      _showMessage('An error occurred during sign in: $e', isError: true);
+      // AuthWrapper will handle successful navigation automatically.
     } finally {
       _setLoading(false);
     }
@@ -116,15 +99,10 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
-          'Doctor Verification',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-          ),
+          'Doctor Sign In',
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
         elevation: 0,
@@ -137,9 +115,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child:
-                  _verificationId == null
-                      ? _buildVerificationForm()
-                      : _buildOtpForm(),
+                  _verificationId == null ? _buildPhoneForm() : _buildOtpForm(),
             ),
           ),
           if (_isLoading)
@@ -152,29 +128,16 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
     );
   }
 
-  Column _buildVerificationForm() {
+  Column _buildPhoneForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Text(
-          'Enter your credentials to claim your profile.',
+          'Enter your registered phone number to sign in.',
           textAlign: TextAlign.center,
           style: TextStyle(color: Colors.black87),
         ),
         const SizedBox(height: 24),
-        TextFormField(
-          controller: _licenseController,
-          decoration: const InputDecoration(
-            labelText: 'Medical License ID',
-            border: OutlineInputBorder(),
-            labelStyle: TextStyle(color: Colors.black87),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-            ),
-          ),
-          validator: (v) => v!.isEmpty ? 'License ID cannot be empty' : null,
-        ),
-        const SizedBox(height: 16),
         TextFormField(
           controller: _phoneController,
           decoration: const InputDecoration(
@@ -190,7 +153,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         ),
         const SizedBox(height: 24),
         ElevatedButton(
-          onPressed: _verifyDoctor,
+          onPressed: _sendOtp,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             backgroundColor: Colors.black,
@@ -201,26 +164,8 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
             ),
           ),
           child: const Text(
-            'Verify & Send OTP',
+            'Send OTP',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-        ),
-        const SizedBox(height: 16),
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const ExistingDoctorLoginScreen(),
-              ),
-            );
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.black87,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-          ),
-          child: const Text(
-            "Already have an account? Sign In",
-            style: TextStyle(fontSize: 14),
           ),
         ),
       ],
@@ -257,7 +202,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         ),
         const SizedBox(height: 24),
         ElevatedButton(
-          onPressed: () => _claimAndSignIn(),
+          onPressed: _verifyAndSignIn,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             backgroundColor: Colors.black,
@@ -278,7 +223,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
             foregroundColor: Colors.black87,
             padding: const EdgeInsets.symmetric(vertical: 12),
           ),
-          child: const Text('Change Details?', style: TextStyle(fontSize: 14)),
+          child: const Text('Change Number?', style: TextStyle(fontSize: 14)),
         ),
       ],
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/auth/auth_service.dart';
+import 'package:maternalhealthcare/patient_side/auth/auth_service.dart';
 import 'package:maternalhealthcare/patient_side/provider/profile_provider.dart';
 import 'package:provider/provider.dart';
 

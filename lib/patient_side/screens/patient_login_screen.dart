@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/auth/auth_service.dart';
+import 'package:maternalhealthcare/patient_side/auth/auth_service.dart';
 
 class PatientLoginScreen extends StatefulWidget {
   const PatientLoginScreen({super.key});

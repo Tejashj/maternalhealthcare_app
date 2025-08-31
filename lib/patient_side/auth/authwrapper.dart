@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:maternalhealthcare/auth/auth_service.dart';
+import 'package:maternalhealthcare/patient_side/auth/auth_service.dart';
 import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
 import 'package:maternalhealthcare/patient_side/screens/home.dart';
 import 'package:maternalhealthcare/patient_side/screens/onboarding_screen.dart';

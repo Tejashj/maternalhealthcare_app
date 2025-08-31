@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/auth/profile.dart';
+import 'package:maternalhealthcare/patient_side/auth/profile.dart';
 import 'package:maternalhealthcare/doc_prescription/first_page.dart';
 import 'package:maternalhealthcare/patient_side/screens/govt_schemes.dart';
 import 'package:maternalhealthcare/patient_side/screens/lib_and_relax.dart';

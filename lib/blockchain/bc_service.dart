@@ -43,7 +43,7 @@ class _PatientPageState extends State<PatientPage> {
     ethClient = Web3Client(rpcUrl, Client());
     credentials = EthPrivateKey.fromHex(privateKey);
 
-    String abi = '''[
+    String _ = '''[
       { "inputs": [ {"internalType": "string","name": "_name","type": "string"}, {"internalType": "uint256","name": "_age","type": "uint256"}, {"internalType": "string","name": "_ultrasoundHash","type": "string"} ], "name": "addPatient", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
       { "inputs": [{"internalType": "uint256","name": "_id","type": "uint256"}], "name": "getPatient", "outputs": [ {"internalType": "string","name": "","type": "string"}, {"internalType": "uint256","name": "","type": "uint256"}, {"internalType": "string","name": "","type": "string"} ], "stateMutability": "view", "type": "function" },
       { "inputs": [], "name": "patientCount", "outputs": [{"internalType": "uint256","name": "","type": "uint256"}], "stateMutability": "view", "type": "function" },
