@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:maternalhealthcare/doctor_side/screens/vaccine_marker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+// Add this import
 
 class PatientDetailScreen extends StatelessWidget {
   final dynamic patient;
@@ -66,7 +68,6 @@ class PatientDetailScreen extends StatelessWidget {
         "${patientId}_${DateTime.now().millisecondsSinceEpoch}.$ext";
 
     // Define the path inside the 'prescription_documents' bucket
-    // Note: The folder "prescription" will be automatically created if it doesn't exist
     final filePath = "prescription/$fileName";
 
     try {
@@ -79,9 +80,8 @@ class PatientDetailScreen extends StatelessWidget {
         );
       }
 
-      // ✅ The correct Supabase upload method
       await supabase.storage
-          .from('prescription_documents') // Your bucket name
+          .from('prescription_documents')
           .upload(
             filePath,
             file,
@@ -112,6 +112,14 @@ class PatientDetailScreen extends StatelessWidget {
     }
   }
 
+  // Update the vaccine marking handler
+  void _handleVaccineMarking(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const VaccineMarkerScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final patientName =
@@ -122,10 +130,21 @@ class PatientDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text("Patient: $patientName")),
       body: Center(
-        child: ElevatedButton.icon(
-          icon: const Icon(Icons.upload_file),
-          label: const Text("Upload Prescription"),
-          onPressed: () => _uploadPhoto(context),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.upload_file),
+              label: const Text("Upload Prescription"),
+              onPressed: () => _uploadPhoto(context),
+            ),
+            const SizedBox(height: 20), // Spacing between buttons
+            ElevatedButton.icon(
+              icon: const Icon(Icons.vaccines),
+              label: const Text("Vaccine Marker"),
+              onPressed: () => _handleVaccineMarking(context),
+            ),
+          ],
         ),
       ),
     );
