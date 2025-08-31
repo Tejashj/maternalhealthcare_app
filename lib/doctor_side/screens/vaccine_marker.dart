@@ -2,30 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class VaccinationPage extends StatefulWidget {
-  const VaccinationPage({super.key});
+class VaccineMarkerScreen extends StatefulWidget {
+  const VaccineMarkerScreen({super.key});
 
   @override
-  State<VaccinationPage> createState() => _VaccinationPageState();
+  State<VaccineMarkerScreen> createState() => _VaccineMarkerScreenState();
 }
 
-class _VaccinationPageState extends State<VaccinationPage> {
-  Set<int> _completedVaccinations = {};
+class _VaccineMarkerScreenState extends State<VaccineMarkerScreen> {
+  final Set<int> _completedVaccinations = {};
   static const String _prefsKey = 'completed_vaccinations';
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCompletedVaccinations();
-  }
-
+  // Load completed vaccinations from SharedPreferences
   Future<void> _loadCompletedVaccinations() async {
     final prefs = await SharedPreferences.getInstance();
     final completedList =
         prefs.getStringList(_prefsKey)?.map(int.parse).toList() ?? [];
     setState(() {
-      _completedVaccinations = completedList.toSet();
+      _completedVaccinations.addAll(completedList);
     });
+  }
+
+  // Save completed vaccinations to SharedPreferences
+  Future<void> _saveCompletedVaccinations() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+      _prefsKey,
+      _completedVaccinations.map((e) => e.toString()).toList(),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCompletedVaccinations();
   }
 
   static const List<Map<String, String>> vaccinations = [
@@ -122,17 +132,14 @@ class _VaccinationPageState extends State<VaccinationPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-          ), // Changed to white
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Vaccination Guide',
-          style: TextStyle(color: Colors.white), // Changed to white
+          'Vaccine Tracker',
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.black, // Changed to black
+        backgroundColor: Colors.black,
         elevation: 0,
       ),
       body: Padding(
@@ -152,7 +159,7 @@ class _VaccinationPageState extends State<VaccinationPage> {
               color: isCompleted ? Colors.grey.shade100 : Colors.white,
               child: ExpansionTile(
                 leading: CircleAvatar(
-                  backgroundColor: isCompleted ? Colors.green : Colors.black,
+                  backgroundColor: isCompleted ? Colors.grey : Colors.black,
                   child: Icon(
                     isCompleted ? Icons.check : Icons.vaccines,
                     color: Colors.white,
@@ -168,10 +175,7 @@ class _VaccinationPageState extends State<VaccinationPage> {
                 ),
                 subtitle: Text(
                   'Tap for more info',
-                  style: TextStyle(
-                    color: Colors.blue.shade900,
-                    decoration: isCompleted ? TextDecoration.lineThrough : null,
-                  ),
+                  style: TextStyle(color: Colors.blue.shade900),
                 ),
                 children: [
                   Container(
@@ -242,23 +246,50 @@ class _VaccinationPageState extends State<VaccinationPage> {
                         Center(
                           child: ElevatedButton.icon(
                             onPressed: () async {
-                              final msg =
-                                  'Reminder: ${v['name']} is scheduled for ${v['month']}.';
-                              sendSMS(context, msg);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Reminder sent successfully!'),
-                                ),
-                              );
+                              setState(() {
+                                if (isCompleted) {
+                                  _completedVaccinations.remove(index);
+                                } else {
+                                  _completedVaccinations.add(index);
+                                }
+                              });
+                              await _saveCompletedVaccinations(); // Save after each change
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      isCompleted
+                                          ? 'Vaccine marked as incomplete'
+                                          : 'Vaccine marked as completed!',
+                                    ),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              }
                             },
-                            icon: const Icon(Icons.alarm),
+                            icon: Icon(
+                              isCompleted ? Icons.undo : Icons.check,
+                              color:
+                                  isCompleted
+                                      ? Colors.blue[900]
+                                      : Colors.green[900],
+                            ),
                             label: Text(
-                              'Remind Me',
-                              style: TextStyle(color: Colors.orange[900]),
+                              isCompleted
+                                  ? 'Mark as Incomplete'
+                                  : 'Mark as Done',
+                              style: TextStyle(
+                                color:
+                                    isCompleted
+                                        ? Colors.blue[900]
+                                        : Colors.green[900],
+                              ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange.shade100,
-                              foregroundColor: Colors.orange[900],
+                              backgroundColor:
+                                  isCompleted
+                                      ? Colors.blue.shade100
+                                      : Colors.green.shade100,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 10,
