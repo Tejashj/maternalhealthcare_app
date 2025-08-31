@@ -4,8 +4,24 @@ import 'package:maternalhealthcare/patient_side/screens/babypositiondetection.da
 import 'package:provider/provider.dart';
 import 'vitals_monitoring_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Trigger the data fetch from the UI when it loads.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<PatientDataProvider>(context, listen: false);
+      provider.fetchVitals();
+      provider.fetchFetalData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +43,6 @@ class DashboardScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // Vitals Monitoring Card
                 UnifiedCard(
                   title: 'Vitals Monitoring',
                   isLoading: patientData.isVitalsLoading,
@@ -42,15 +57,12 @@ class DashboardScreen extends StatelessWidget {
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          // ** CHANGE: Navigate to the real monitoring screen **
                           builder: (context) => VitalsMonitoringScreen(),
                         ),
                       ),
                   cardType: CardType.monitoring,
                 ),
                 const SizedBox(height: 8),
-
-                // Fetal Monitoring Card (example navigation)
                 UnifiedCard(
                   title: 'Fetal Monitoring',
                   isLoading: patientData.isFetalDataLoading,
@@ -62,7 +74,13 @@ class DashboardScreen extends StatelessWidget {
                           )
                           .toList(),
                   onTap: () {
-                    // TODO: Navigate to FetalMonitoringScreen when it's built
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Fetal Monitoring Screen not yet implemented.',
+                        ),
+                      ),
+                    );
                   },
                   cardType: CardType.monitoring,
                 ),
@@ -80,7 +98,6 @@ class DashboardScreen extends StatelessWidget {
                   },
                   cardType: CardType.action,
                 ),
-                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -90,7 +107,7 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-// Unified card that can handle both monitoring and action types
+// --- Reusable Widgets ---
 enum CardType { monitoring, action }
 
 class UnifiedCard extends StatelessWidget {
@@ -180,7 +197,6 @@ class UnifiedCard extends StatelessWidget {
   }
 }
 
-// DataChip widget
 class DataChip extends StatelessWidget {
   final String label;
   final String value;

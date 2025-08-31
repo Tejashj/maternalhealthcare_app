@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maternalhealthcare/auth/login_page.dart';
-import 'package:maternalhealthcare/doc_prescription/first_page.dart';
 import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
-import 'package:maternalhealthcare/patient_side/screens/dashboard.dart';
-import 'package:maternalhealthcare/patient_side/screens/features_dashboard.dart';
-import 'package:maternalhealthcare/patient_side/screens/health_records.dart';
-import 'package:maternalhealthcare/patient_side/screens/home.dart';
+import 'package:maternalhealthcare/patient_side/screens/patient_login_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -45,7 +40,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const PatientHomeScreen(),
+                      builder: (context) => const PatientLoginScreen(),
                     ),
                   );
                 },

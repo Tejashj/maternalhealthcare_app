@@ -1,67 +1,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as sp;
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
+
+// A simple class to hold user profile data for the AuthWrapper
+class UserProfile {
+  final String uid;
+  final String? fullName;
+  final String role;
+  UserProfile({required this.uid, this.fullName, required this.role});
+}
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final sp.SupabaseClient _supabase = sp.Supabase.instance.client;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email'],
-  ); // Create single instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // --- Core Methods ---
-
-  // Stream for auth state changes (handles automatic persistence)
+  // --- Core Properties ---
   Stream<User?> get authStateChanges => _auth.authStateChanges();
-
-  // Get current user from Firebase
   User? get currentUser => _auth.currentUser;
 
-  // --- Sign In / Sign Up Flow ---
+  // --- Authentication Methods (Called by UI) ---
 
-  // Google Sign In
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
-      debugPrint("1. Starting Google Sign-In process...");
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        debugPrint("   -> Google Sign-In was cancelled by the user.");
-        return null;
-      }
-      debugPrint("2. Google account selected: ${googleUser.email}");
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      debugPrint("3. Signing in to Firebase with credential...");
-      final userCredential = await _auth.signInWithCredential(credential);
-      debugPrint(
-        "✅ Firebase sign-in successful! UID: ${userCredential.user?.uid}",
-      );
-
-      // ** SUPABASE BRIDGE **
-      debugPrint("4. Bridging to Supabase...");
-      final bool supabaseSuccess = await _signInToSupabaseWithFirebaseToken();
-      if (!supabaseSuccess) {
-        throw Exception("Could not sign in to Supabase.");
-      }
-      debugPrint("✅ Supabase sign-in successful!");
-
-      return userCredential;
-    } catch (e) {
-      debugPrint("❌ ERROR during Google sign-in: $e");
-      // Clean up on failure
-      await signOut();
-      return null;
-    }
-  }
-
-  // Phone Number Sign In (Part 1: Send OTP)
+  /// Triggers the Firebase phone authentication flow.
   Future<void> verifyPhoneNumber({
     required String phoneNumber,
     required void Function(PhoneAuthCredential) verificationCompleted,
@@ -78,144 +37,79 @@ class AuthService {
     );
   }
 
-  // Phone Number Sign In (Part 2: Verify OTP)
+  /// Signs the user in with a Firebase credential.
+  Future<UserCredential?> signInWithCredential(
+    AuthCredential credential,
+  ) async {
+    return await _auth.signInWithCredential(credential);
+  }
+
+  /// Signs the user in manually with the OTP code.
   Future<UserCredential?> signInWithSmsCode(
     String verificationId,
     String smsCode,
   ) async {
     try {
-      final AuthCredential credential = PhoneAuthProvider.credential(
+      final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: smsCode,
       );
+      return await signInWithCredential(credential);
+    } catch (e) {
+      debugPrint("Error in signInWithSmsCode: $e");
+      return null;
+    }
+  }
 
-      debugPrint("1. Signing in to Firebase with SMS code...");
-      final userCredential = await _auth.signInWithCredential(credential);
-      debugPrint(
-        "✅ Firebase sign-in successful! UID: ${userCredential.user?.uid}",
-      );
+  /// Signs the user out from Firebase.
+  Future<void> signOut() async {
+    await _auth.signOut();
+    debugPrint("✅ User signed out from Firebase.");
+  }
 
-      // ** SUPABASE BRIDGE **
-      debugPrint("2. Bridging to Supabase...");
-      final bool supabaseSuccess = await _signInToSupabaseWithFirebaseToken();
-      if (!supabaseSuccess) {
-        throw Exception("Could not sign in to Supabase.");
+  // --- Profile Management Methods ---
+
+  /// Fetches the user's profile from the Firestore 'users' collection.
+  Future<UserProfile?> getUserProfile(String uid) async {
+    try {
+      final docSnapshot = await _firestore.collection('users').doc(uid).get();
+      if (!docSnapshot.exists) {
+        return null; // Profile doesn't exist
       }
-      debugPrint("✅ Supabase sign-in successful!");
-
-      return userCredential;
-    } on FirebaseAuthException catch (e) {
-      debugPrint("❌ ERROR during Firebase phone sign-in: ${e.message}");
-      return null;
+      final data = docSnapshot.data()!;
+      return UserProfile(
+        uid: uid,
+        fullName: data['fullName'],
+        role: data['role'],
+      );
     } catch (e) {
-      debugPrint("❌ ERROR during Supabase bridge: $e");
-      await signOut();
+      debugPrint("Error fetching user profile: $e");
       return null;
     }
   }
 
-  // --- Profile Management ---
-
-  // Check if a user profile exists in the Supabase 'users' table
-  Future<bool> doesUserExist() async {
-    final firebaseUser = _auth.currentUser;
-    if (firebaseUser == null) return false;
-
-    try {
-      final response =
-          await _supabase
-              .from('users')
-              .select('id')
-              .eq('id', firebaseUser.uid)
-              .single(); // .single() throws an error if no row is found
-
-      // If we get here, a user was found
-      return true;
-    } catch (e) {
-      // If .single() throws an error, it means no user was found, which is expected for new users.
-      debugPrint("User does not exist in Supabase yet. $e");
-      return false;
-    }
-  }
-
-  // Create patient profile in Supabase
+  /// Creates the patient's profile in Firestore after onboarding.
   Future<void> createPatientProfile({
-    required String name,
-    required String dob,
+    required String uid,
+    required String phoneNumber,
+    required String fullName,
+    required DateTime dateOfBirth,
     required double weight,
-    required String doctorId,
+    required String selectedDoctorId,
   }) async {
-    final firebaseUser = _auth.currentUser;
-    if (firebaseUser == null) {
-      throw Exception("User is not authenticated with Firebase.");
-    }
-
     try {
-      await _supabase.from('users').insert({
-        'id': firebaseUser.uid, // Use Firebase UID as the primary key
-        'full_name': name,
-        'date_of_birth': dob,
-        'phone_number': firebaseUser.phoneNumber,
+      await _firestore.collection('users').doc(uid).set({
+        'uid': uid,
+        'phoneNumber': phoneNumber,
+        'fullName': fullName,
+        'dateOfBirth': Timestamp.fromDate(dateOfBirth),
+        'weightKg': weight,
+        'consultingDoctorId': selectedDoctorId,
         'role': 'patient',
-        'weight_kg': weight,
-        'consulting_doctor_id': doctorId,
       });
     } catch (e) {
-      debugPrint("Error creating patient profile in Supabase: $e");
-      throw Exception("Could not save profile to the database.");
-    }
-  }
-
-  // --- Sign Out ---
-
-  Future<void> signOut() async {
-    try {
-      if (await _googleSignIn.isSignedIn()) {
-        await _googleSignIn.signOut();
-      }
-      await _auth.signOut();
-      await _supabase.auth.signOut();
-      debugPrint("✅ User signed out from all services.");
-    } catch (e) {
-      debugPrint("❌ Error during sign out: $e");
-      throw Exception("Failed to sign out properly");
-    }
-  }
-
-  // --- Private Helper Methods ---
-
-  // The "Bridge" from Firebase to Supabase
-  Future<bool> _signInToSupabaseWithFirebaseToken() async {
-    try {
-      final firebaseUser = _auth.currentUser;
-      if (firebaseUser == null) {
-        debugPrint("❌ No Firebase user found");
-        return false;
-      }
-
-      final idToken = await firebaseUser.getIdToken();
-      if (idToken == null) {
-        debugPrint("❌ Firebase ID token is null");
-        return false;
-      }
-
-      final response = await _supabase.functions.invoke(
-        'firebase-auth',
-        body: {'idToken': idToken},
-      );
-
-      if (response.data != null && response.data['error'] != null) {
-        debugPrint("❌ Supabase function error: ${response.data['error']}");
-        return false;
-      }
-
-      await _supabase.auth.setSession(
-        response.data['session']['refresh_token'],
-      );
-      return true;
-    } catch (e) {
-      debugPrint("❌ Error in Supabase bridge: $e");
-      return false;
+      debugPrint('Error creating patient profile: $e');
+      rethrow;
     }
   }
 }

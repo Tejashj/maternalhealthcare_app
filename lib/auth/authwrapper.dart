@@ -5,85 +5,82 @@ import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
 import 'package:maternalhealthcare/patient_side/screens/home.dart';
 import 'package:maternalhealthcare/patient_side/screens/onboarding_screen.dart';
 import 'package:maternalhealthcare/utils/role_selection.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' as sp;
 
-// This is your new and improved AuthGate/AuthWrapper
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
   @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  final AuthService _authService = AuthService();
+
+  // These state variables are the key to the fix.
+  // They prevent the FutureBuilder from re-running on every build.
+  Future<UserProfile?>? _profileFuture;
+  String? _currentUid;
+
+  @override
   Widget build(BuildContext context) {
-    // Listen to Firebase Authentication state changes
     return StreamBuilder<User?>(
-      stream: AuthService().authStateChanges,
-      builder: (context, snapshot) {
-        // 1. While connecting to Firebase, show a loading indicator
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      stream: _authService.authStateChanges,
+      builder: (context, firebaseUserSnapshot) {
+        if (firebaseUserSnapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // 2. If the snapshot has user data, the user is logged into Firebase
-        if (snapshot.hasData) {
-          // Now we need to check if they have a profile in Supabase
-          return FutureBuilder<Map<String, dynamic>?>(
-            // We create a simple future to check for profile and role
-            future: _getUserProfileAndRole(),
-            builder: (context, profileSnapshot) {
-              if (profileSnapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
+        final firebaseUser = firebaseUserSnapshot.data;
 
-              final userProfile = profileSnapshot.data;
-
-              // 3. If no profile exists, they are a new user -> Onboarding
-              if (userProfile == null) {
-                return const OnboardingScreen();
-              }
-
-              // 4. Profile exists, check their role and navigate accordingly
-              final role = userProfile['role'];
-              if (role == 'patient') {
-                return const PatientHomeScreen();
-              } else if (role == 'doctor') {
-                return const DoctorHomeScreen();
-              } else {
-                // Fallback in case of an unexpected role
-                return const RoleSelectionScreen();
-              }
-            },
-          );
+        // CASE 1: User is logged out.
+        if (firebaseUser == null) {
+          // Reset the future when the user logs out.
+          _profileFuture = null;
+          _currentUid = null;
+          return const RoleSelectionScreen();
         }
 
-        // 5. If no user data, they are logged out -> Role Selection Screen
-        return const RoleSelectionScreen();
+        // ** THE FIX IS HERE **
+        // We only create a new future if the user has changed (e.g., just logged in).
+        // On subsequent rebuilds where the user is the same, we reuse the existing future.
+        if (firebaseUser.uid != _currentUid) {
+          _currentUid = firebaseUser.uid;
+          _profileFuture = _authService.getUserProfile(firebaseUser.uid);
+        }
+
+        // CASE 2: User is logged in, use the memoized future to get their profile.
+        return FutureBuilder<UserProfile?>(
+          future:
+              _profileFuture, // Use the state variable, not a new function call
+          builder: (context, profileSnapshot) {
+            if (profileSnapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            final userProfile = profileSnapshot.data;
+
+            if (userProfile == null) {
+              return const OnboardingScreen();
+            }
+
+            if (userProfile.fullName == null || userProfile.fullName!.isEmpty) {
+              return const OnboardingScreen();
+            }
+
+            if (userProfile.role == 'patient') {
+              return const PatientHomeScreen();
+            } else if (userProfile.role == 'doctor') {
+              return const DoctorHomeScreen();
+            } else {
+              return const RoleSelectionScreen();
+            }
+          },
+        );
       },
     );
-  }
-
-  // Helper function to get the user's role from Supabase
-  Future<Map<String, dynamic>?> _getUserProfileAndRole() async {
-    final firebaseUid = FirebaseAuth.instance.currentUser?.uid;
-    if (firebaseUid == null) {
-      return null;
-    }
-
-    try {
-      final data =
-          await sp.Supabase.instance.client
-              .from('users')
-              .select('role')
-              .eq('id', firebaseUid)
-              .single();
-      return data;
-    } catch (e) {
-      // This error likely means the user exists in Firebase Auth
-      // but their profile hasn't been created in Supabase yet.
-      debugPrint("Could not fetch user profile: $e");
-      return null;
-    }
   }
 }

@@ -1,35 +1,15 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:maternalhealthcare/auth/authwrapper.dart';
-import 'package:maternalhealthcare/config/appwrite_client.dart';
+import 'package:maternalhealthcare/config/firebase_options.dart';
 import 'package:maternalhealthcare/doctor_side/provider/doctor_provider.dart';
 import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
-import 'package:maternalhealthcare/utils/role_selection.dart';
+import 'package:maternalhealthcare/patient_side/provider/profile_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'config/firebase_options.dart';
-import 'config/constants.dart';
-import 'package:maternalhealthcare/providers/auth_provider.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await dotenv.load(fileName: ".env");
-
-  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: AppConstants.supabaseUrl,
-    anonKey: AppConstants.supabaseAnonKey,
-  );
-
-  // Initialize Appwrite
-  AppwriteClient.instance.init();
-
-  // Run the app with providers
   runApp(const MyApp());
 }
 
@@ -40,15 +20,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => PatientDataProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => DoctorDataProvider()),
       ],
       child: MaterialApp(
-        title: 'Health App',
+        title: 'Maternal Healthcare App',
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: Colors.grey[100],
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          scaffoldBackgroundColor: Colors.grey[50],
           fontFamily: 'Inter',
           cardTheme: CardThemeData(
             elevation: 2,
@@ -57,8 +38,8 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const AuthWrapper(),
         debugShowCheckedModeBanner: false,
+        home: const AuthWrapper(),
       ),
     );
   }

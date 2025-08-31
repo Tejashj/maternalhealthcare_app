@@ -13,37 +13,39 @@ class PatientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.zero,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const CircleAvatar(
                 radius: 30,
-                backgroundColor: Color(0xFFE0E0E0), // Grey color from wireframe
+                backgroundColor: Color(0xFFE0E0E0),
                 child: Icon(
                   Icons.person_outline,
-                  size: 30,
+                  size: 35,
                   color: Color(0xFF757575),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
                 patientName,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 8),
-              // Placeholders for the grey lines
+              // Placeholder bars from wireframe
               Container(
-                height: 6,
+                height: 8,
                 width: 80,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
@@ -52,7 +54,7 @@ class PatientCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Container(
-                height: 6,
+                height: 8,
                 width: 60,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],

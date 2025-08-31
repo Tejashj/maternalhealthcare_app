@@ -23,48 +23,59 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch the list of doctors as soon as the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<PatientDataProvider>(context, listen: false).fetchDoctors();
     });
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _dobController.dispose();
+    _weightController.dispose();
+    super.dispose();
+  }
+
   Future<void> _saveProfile() async {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedDoctorId == null) {
+    if (!_formKey.currentState!.validate()) return;
+    if (_selectedDoctorId == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a doctor')));
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      final authService = AuthService();
+      final currentUser = authService.currentUser;
+      if (currentUser == null) throw Exception("No user signed in.");
+
+      await authService.createPatientProfile(
+        uid: currentUser.uid,
+        phoneNumber: currentUser.phoneNumber ?? 'N/A',
+        fullName: _nameController.text,
+        dateOfBirth: DateTime.parse(_dobController.text),
+        weight: double.parse(_weightController.text),
+        selectedDoctorId: _selectedDoctorId!,
+      );
+
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const PatientHomeScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Please select a doctor')));
-        return;
+        ).showSnackBar(SnackBar(content: Text('Failed to save profile: $e')));
       }
-
-      setState(() => _isSaving = true);
-
-      try {
-        // We use the AuthService to create the profile in Supabase
-        await AuthService().createPatientProfile(
-          name: _nameController.text,
-          dob: _dobController.text,
-          weight: double.parse(_weightController.text),
-          doctorId: _selectedDoctorId!,
-        );
-
-        // Navigate to the main app after saving is successful
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const PatientHomeScreen()),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Failed to save profile: $e')));
-        }
-      } finally {
-        if (mounted) {
-          setState(() => _isSaving = false);
-        }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
       }
     }
   }
@@ -79,44 +90,61 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildTextField(
-                    controller: _nameController,
-                    label: 'Full Name',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _dobController,
-                    label: 'Date of Birth (YYYY-MM-DD)',
-                    hint: 'e.g., 1995-07-20',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _weightController,
-                    label: 'Current Weight (kg)',
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 24),
-                  _buildDoctorDropdown(provider.doctors),
-                  const SizedBox(height: 32),
-                  _isSaving
-                      ? const Center(child: CircularProgressIndicator())
-                      : ElevatedButton(
-                        onPressed: _saveProfile,
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        "Welcome! Please provide a few details to get started.",
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      _buildTextField(
+                        controller: _nameController,
+                        label: 'Full Name',
+                        icon: Icons.person_outline,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _dobController,
+                        label: 'Date of Birth (YYYY-MM-DD)',
+                        hint: 'e.g., 1995-07-20',
+                        icon: Icons.calendar_today_outlined,
+                        keyboardType: TextInputType.datetime,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTextField(
+                        controller: _weightController,
+                        label: 'Current Weight (kg)',
+                        icon: Icons.monitor_weight_outlined,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 24),
+                      _buildDoctorDropdown(provider.doctors),
+                      const SizedBox(height: 32),
+                      ElevatedButton(
+                        onPressed: _isSaving ? null : _saveProfile,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
                         child: const Text('Save and Continue'),
                       ),
-                ],
+                    ],
+                  ),
+                ),
               ),
-            ),
+              if (_isSaving)
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+            ],
           );
         },
       ),
@@ -126,6 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   TextFormField _buildTextField({
     required TextEditingController controller,
     required String label,
+    required IconData icon,
     TextInputType? keyboardType,
     String? hint,
   }) {
@@ -133,6 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
+        prefixIcon: Icon(icon),
         labelText: label,
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -146,6 +176,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return DropdownButtonFormField<String>(
       value: _selectedDoctorId,
       decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.medical_services_outlined),
         labelText: 'Consulting Doctor',
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       ),
