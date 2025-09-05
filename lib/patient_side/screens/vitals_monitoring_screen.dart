@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class MonitoringScreen extends StatefulWidget {
   const MonitoringScreen({super.key});
@@ -21,7 +23,27 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
   Timer? _dataTimer;
   Timer? _bpmTimer;
 
-  /// ✅ Start monitoring session
+  final String espIp = "ip of esp 32"; //
+
+  
+  Future<void> _fetchBPM() async {
+    try {
+      final response = await http.get(Uri.parse("$espIp/bpm"));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        int newBPM = data['bpm'];
+
+        setState(() {
+          _bpm = newBPM;
+          _bpmReadings.add(newBPM);
+          _bpmReadingsCount++;
+        });
+      }
+    } catch (e) {
+      print(" Error fetching BPM: $e");
+    }
+  }
+
   void _startMonitoring() {
     setState(() {
       _bpm = 0;
@@ -33,14 +55,9 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
       _elapsedSeconds = 0;
     });
 
-    // Simulate BPM values every 2 seconds (replace with ESP32 values)
+    // Fetch BPM every 2s from ESP32
     _bpmTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      final newBPM = 60 + (30 - (timer.tick % 60)); // demo fake BPM
-      setState(() {
-        _bpm = newBPM;
-        _bpmReadings.add(newBPM);
-        _bpmReadingsCount++;
-      });
+      _fetchBPM();
     });
 
     // Track session time (120s = 2 min)
@@ -54,7 +71,6 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
     });
   }
 
-  /// ✅ Complete monitoring and save ONLY final average to Supabase
   void _completeMonitoring() async {
     setState(() {
       _isMonitoring = false;
@@ -81,9 +97,9 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
         'created_at': DateTime.now().toIso8601String(),
       });
 
-      print("✅ Final average saved: $_averageBPM BPM");
+      print(" Final average saved: $_averageBPM BPM");
     } catch (e) {
-      print("⚠️ Error saving data to Supabase: $e");
+      print(" Error saving data to Supabase: $e");
     }
   }
 
