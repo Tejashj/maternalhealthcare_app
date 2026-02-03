@@ -1,217 +1,262 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_signin_button/flutter_signin_button.dart';
-// import 'auth_service.dart';
+import 'package:flutter/material.dart';
+import 'package:maternalhealthcare/patient_side/auth/auth_service.dart';
+import 'package:maternalhealthcare/patient_side/screens/home.dart';
 
-// class LoginPage extends StatefulWidget {
-//   const LoginPage({Key? key}) : super(key: key);
+class PatientLoginScreen extends StatefulWidget {
+  const PatientLoginScreen({super.key});
 
-//   @override
-//   _LoginPageState createState() => _LoginPageState();
-// }
+  @override
+  State<PatientLoginScreen> createState() => _PatientLoginScreenState();
+}
 
-// class _LoginPageState extends State<LoginPage> {
-//   final AuthService _authService = AuthService();
-//   final _phoneController = TextEditingController();
-//   final _smsCodeController = TextEditingController();
+class _PatientLoginScreenState extends State<PatientLoginScreen> {
+  final AuthService _authService = AuthService();
+  final _phoneController = TextEditingController();
+  final _smsCodeController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
-//   String? _verificationId;
-//   bool _isLoading = false;
+  String? _verificationId;
+  bool _isLoading = false;
+  bool _isPhoneValid = false;
 
-//   // --- Helper methods for loading and error handling ---
-//   void _setLoading(bool value) {
-//     setState(() {
-//       _isLoading = value;
-//     });
-//   }
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _smsCodeController.dispose();
+    super.dispose();
+  }
 
-//   void _showError(String message) {
-//     if (mounted) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(message), backgroundColor: Colors.red),
-//       );
-//     }
-//   }
+  void _setLoading(bool value) {
+    if (mounted) {
+      setState(() => _isLoading = value);
+    }
+  }
 
-//   // --- Sign-in Logic ---
+  void _showMessage(String message, {bool isError = false}) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red : Colors.green,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
 
-//   Future<void> _sendOtp() async {
-//     if (_phoneController.text.isEmpty) {
-//       _showError('Please enter a phone number.');
-//       return;
-//     }
-//     _setLoading(true);
-//     try {
-//       await _authService.verifyPhoneNumber(
-//         phoneNumber: _phoneController.text,
-//         verificationCompleted: (credential) async {
-//           // This is for auto-retrieval, rare on most devices
-//           // We can optionally sign in here
-//         },
-//         verificationFailed: (e) {
-//           _showError(e.message ?? 'Verification failed. Please try again.');
-//         },
-//         codeSent: (verificationId, resendToken) {
-//           setState(() {
-//             _verificationId = verificationId;
-//           });
-//           if (mounted) {
-//             ScaffoldMessenger.of(
-//               context,
-//             ).showSnackBar(const SnackBar(content: Text('OTP has been sent!')));
-//           }
-//         },
-//         codeAutoRetrievalTimeout: (verificationId) {},
-//       );
-//     } catch (e) {
-//       _showError('An unexpected error occurred: $e');
-//     } finally {
-//       if (mounted) {
-//         _setLoading(false);
-//       }
-//     }
-//   }
+  bool _validatePhone(String phone) {
+    // Basic Indian phone number validation
+    final RegExp phoneRegex = RegExp(r'^\+91[1-9]\d{9}$');
+    return phoneRegex.hasMatch(phone);
+  }
 
-//   Future<void> _verifyAndSignIn() async {
-//     if (_smsCodeController.text.isEmpty || _verificationId == null) {
-//       _showError('Please enter the OTP.');
-//       return;
-//     }
-//     _setLoading(true);
-//     try {
-//       final userCredential = await _authService.signInWithSmsCode(
-//         _verificationId!,
-//         _smsCodeController.text,
-//       );
-//       // No navigation needed here. AuthWrapper will handle it.
-//       if (userCredential == null) {
-//         _showError('Sign in failed. Please check the OTP and try again.');
-//       }
-//     } catch (e) {
-//       _showError('An unexpected error occurred during sign in: $e');
-//     } finally {
-//       if (mounted) {
-//         _setLoading(false);
-//       }
-//     }
-//   }
+  Future<void> _sendOtp() async {
+    if (!_formKey.currentState!.validate()) return;
 
-//   Future<void> _signInWithGoogle() async {
-//     _setLoading(true);
-//     try {
-//       await _authService.signInWithGoogle();
-//       // No navigation needed here. AuthWrapper will handle it.
-//     } catch (e) {
-//       _showError('Google sign in failed: $e');
-//     } finally {
-//       if (mounted) {
-//         _setLoading(false);
-//       }
-//     }
-//   }
+    _setLoading(true);
+    try {
+      await _authService.verifyPhoneNumber(
+        phoneNumber: _phoneController.text,
+        verificationCompleted: (credential) async {
+          // Auto-verification case (rare on most devices)
+          try {
+            final result = await _authService.signInWithCredential(credential);
+            if (result != null && mounted) {
+              _navigateToHome();
+            }
+          } catch (e) {
+            _showMessage('Auto-verification failed: $e', isError: true);
+          }
+        },
+        verificationFailed: (e) {
+          _showMessage(e.message ?? 'Verification failed', isError: true);
+        },
+        codeSent: (verificationId, resendToken) {
+          setState(() => _verificationId = verificationId);
+          _showMessage('OTP sent successfully!');
+        },
+        codeAutoRetrievalTimeout: (verificationId) {
+          _showMessage('OTP timeout. Please try again.', isError: true);
+        },
+      );
+    } catch (e) {
+      _showMessage('Error: $e', isError: true);
+    } finally {
+      _setLoading(false);
+    }
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Sign In')),
-//       body: Stack(
-//         children: [
-//           SingleChildScrollView(
-//             padding: const EdgeInsets.all(24.0),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.stretch,
-//               children: [
-//                 _buildPhoneAuthForm(),
-//                 const SizedBox(height: 20),
-//                 Row(
-//                   children: [
-//                     const Expanded(child: Divider()),
-//                     Padding(
-//                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-//                       child: Text(
-//                         'OR',
-//                         style: TextStyle(color: Colors.grey.shade600),
-//                       ),
-//                     ),
-//                     const Expanded(child: Divider()),
-//                   ],
-//                 ),
-//                 const SizedBox(height: 20),
-//                 _buildGoogleSignInButton(),
-//               ],
-//             ),
-//           ),
-//           // Loading indicator overlay
-//           if (_isLoading)
-//             Container(
-//               color: Colors.black.withOpacity(0.5),
-//               child: const Center(child: CircularProgressIndicator()),
-//             ),
-//         ],
-//       ),
-//     );
-//   }
+  Future<void> _verifyAndSignIn() async {
+    if (_smsCodeController.text.length != 6) {
+      _showMessage('Please enter a valid 6-digit OTP', isError: true);
+      return;
+    }
 
-//   Widget _buildPhoneAuthForm() {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.stretch,
-//       children: [
-//         Text(
-//           'Sign In with Phone',
-//           style: Theme.of(context).textTheme.headlineSmall,
-//           textAlign: TextAlign.center,
-//         ),
-//         const SizedBox(height: 16),
-//         if (_verificationId == null)
-//           Row(
-//             children: [
-//               Expanded(
-//                 child: TextField(
-//                   controller: _phoneController,
-//                   decoration: const InputDecoration(
-//                     labelText: 'Phone (+91 1234567890)',
-//                     border: OutlineInputBorder(),
-//                   ),
-//                   keyboardType: TextInputType.phone,
-//                 ),
-//               ),
-//               const SizedBox(width: 8),
-//               ElevatedButton(
-//                 onPressed: _sendOtp,
-//                 child: const Text('Send OTP'),
-//               ),
-//             ],
-//           ),
-//         if (_verificationId != null)
-//           Column(
-//             children: [
-//               TextField(
-//                 controller: _smsCodeController,
-//                 decoration: const InputDecoration(
-//                   labelText: '6-digit OTP',
-//                   border: OutlineInputBorder(),
-//                 ),
-//                 keyboardType: TextInputType.number,
-//               ),
-//               const SizedBox(height: 12),
-//               ElevatedButton(
-//                 onPressed: _verifyAndSignIn,
-//                 child: const Text('Verify & Sign In'),
-//               ),
-//               TextButton(
-//                 onPressed: () => setState(() => _verificationId = null),
-//                 child: const Text('Change Number?'),
-//               ),
-//             ],
-//           ),
-//       ],
-//     );
-//   }
+    _setLoading(true);
+    try {
+      final result = await _authService.signInWithSmsCode(
+        _verificationId!,
+        _smsCodeController.text,
+      );
 
-//   Widget _buildGoogleSignInButton() {
-//     return SignInButton(
-//       Buttons.Google,
-//       text: "Sign in with Google",
-//       onPressed: _signInWithGoogle,
-//     );
-//   }
-// }
+      if (result != null) {
+        // Success - navigate to home page
+        _showMessage('Sign in successful!');
+        if (mounted) {
+          _navigateToHome();
+        }
+      } else {
+        // Failed verification
+        _showMessage('Invalid OTP. Please try again.', isError: true);
+        _setLoading(false);
+      }
+    } catch (e) {
+      _showMessage('Error: $e', isError: true);
+      _setLoading(false);
+    }
+  }
+
+  void _navigateToHome() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder:
+            (context) =>
+                const PatientHomeScreen(), // Adjust class name as needed
+      ),
+      (route) => false, // Remove all previous routes
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Patient Sign In',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: Stack(
+        children: [
+          Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [_buildPhoneAuthForm()],
+              ),
+            ),
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhoneAuthForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Sign In with Phone',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        if (_verificationId == null) ...[
+          TextFormField(
+            controller: _phoneController,
+            decoration: InputDecoration(
+              labelText: 'Phone Number',
+              hintText: '+91 1234567890',
+              prefixIcon: const Icon(Icons.phone),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            keyboardType: TextInputType.phone,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter a phone number';
+              }
+              if (!_validatePhone(value)) {
+                return 'Please enter a valid Indian phone number';
+              }
+              return null;
+            },
+            onChanged: (value) {
+              setState(() => _isPhoneValid = _validatePhone(value));
+            },
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _isPhoneValid ? _sendOtp : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Send OTP',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ] else ...[
+          TextFormField(
+            controller: _smsCodeController,
+            decoration: InputDecoration(
+              labelText: 'Enter OTP',
+              hintText: '6-digit code',
+              prefixIcon: const Icon(Icons.lock),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            validator: (value) {
+              if (value == null || value.length != 6) {
+                return 'Please enter a valid 6-digit OTP';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _verifyAndSignIn,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Verify & Sign In',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          TextButton(
+            onPressed: () => setState(() => _verificationId = null),
+            child: const Text('Change Number?'),
+          ),
+        ],
+      ],
+    );
+  }
+}

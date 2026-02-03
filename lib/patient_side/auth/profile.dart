@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maternalhealthcare/patient_side/auth/auth_service.dart';
 import 'package:maternalhealthcare/patient_side/provider/profile_provider.dart';
+import 'package:maternalhealthcare/utils/role_selection.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  // --- The "Delicate" Sign Out Method ---
+  // --- Updated Sign Out Method with Navigation ---
   Future<void> _showSignOutConfirmationDialog() async {
     return showDialog<void>(
       context: context,
@@ -45,10 +46,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             FilledButton(
               child: const Text('Sign Out'),
-              onPressed: () {
-                // The AuthWrapper will automatically handle navigation
-                AuthService().signOut();
-                Navigator.of(context).pop(); // Close the dialog
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close the dialog first
+
+                try {
+                  // Sign out from AuthService
+                  await AuthService().signOut();
+
+                  // Navigate to role selection page and clear the navigation stack
+                  if (mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => const RoleSelectionScreen(),
+                      ),
+                      (route) => false, // This removes all previous routes
+                    );
+                  }
+                } catch (e) {
+                  // Handle any sign-out errors
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Sign out failed: ${e.toString()}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
               },
             ),
           ],

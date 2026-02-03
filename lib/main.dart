@@ -2,8 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:maternalhealthcare/doctor_side/screens/doctor_home.dart';
+import 'package:maternalhealthcare/patient_side/screens/home.dart';
+import 'package:maternalhealthcare/patient_side/screens/onboarding_screen.dart';
+import 'package:maternalhealthcare/utils/role_selection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:maternalhealthcare/patient_side/auth/authwrapper.dart';
 import 'package:maternalhealthcare/config/firebase_options.dart';
 import 'package:maternalhealthcare/doctor_side/provider/doctor_provider.dart';
 import 'package:maternalhealthcare/patient_side/provider/patient_provider.dart';
@@ -56,7 +59,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         debugShowCheckedModeBanner: false,
-        home: const AuthWrapper(),
+        home: const PatientHomeScreen(),
       ),
     );
   }

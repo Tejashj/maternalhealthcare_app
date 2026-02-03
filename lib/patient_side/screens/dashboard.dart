@@ -34,9 +34,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             centerTitle: true,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.black,
             elevation: 1,
-            foregroundColor: Colors.black87,
+            foregroundColor: Colors.white,
           ),
           body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -57,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MonitoringScreen(),
+                          builder: (context) => VitalsMonitoringScreen(),
                         ),
                       ),
                   cardType: CardType.monitoring,
@@ -179,7 +179,7 @@ class UnifiedCard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onTap,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(

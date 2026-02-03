@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'record_button.dart';
-import 'take_appointment.dart'; // <-- Import your appointment page
+import 'take_appointment.dart';
 
 class HealthRecordsScreen extends StatefulWidget {
   const HealthRecordsScreen({super.key});
@@ -66,9 +66,9 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         elevation: 1,
-        foregroundColor: Colors.black87,
+        foregroundColor: Colors.white,
         actions: [
           TextButton.icon(
             onPressed: () {},

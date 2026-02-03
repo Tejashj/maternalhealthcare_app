@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:maternalhealthcare/patient_side/auth/profile.dart';
 import 'package:maternalhealthcare/doc_prescription/first_page.dart';
+import 'package:maternalhealthcare/patient_side/screens/chatbot.dart';
 import 'package:maternalhealthcare/patient_side/screens/govt_schemes.dart';
 import 'package:maternalhealthcare/patient_side/screens/lib_and_relax.dart';
+import 'package:maternalhealthcare/patient_side/screens/sos.dart';
 import 'diet_screen.dart';
 import 'vaccination_screen.dart';
 import '../widgets/feature_button.dart';
@@ -21,9 +23,9 @@ class FeaturesDashboardScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         elevation: 1,
-        foregroundColor: Colors.black87,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.account_circle_outlined),
@@ -159,7 +161,7 @@ class FeaturesDashboardScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ProfileScreen(),
+                              builder: (context) => const Sos(),
                             ),
                           );
                         },
@@ -184,7 +186,7 @@ class FeaturesDashboardScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ProfileScreen(),
+                              builder: (context) => const MedicalChatbotPage(),
                             ),
                           );
                         },
