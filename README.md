@@ -1,16 +1,39 @@
-The Maternal Health Monitoring App
-It is a mobile-first application designed to address critical gaps in conventional prenatal care. By providing continuous, real-time monitoring of vital signs such as ECG and heart rate, the app offers expectant mothers and their healthcare providers a clearer, more immediate view of maternal well-being between clinic visits.
+Maternal Health Monitoring App
 
-At its core, the project leverages blockchain technology to create an immutable and tamper-proof health ledger for each patient. This ensures the utmost integrity and security of medical records. Sensitive files, like ultrasound scans, are securely managed via cloud storage, with only their access links recorded on-chain. This hybrid approach guarantees data integrity, patient privacy, and efficient, accessible record-keeping for authorized medical professionals.
+The Maternal Health Monitoring App is a mobile-first solution designed to enhance prenatal care. It enables real-time monitoring of vital signs such as ECG and BPM, while ensuring that all medical records are stored securely on a tamper-proof blockchain ledger. Sensitive files like ultrasound scans are stored in Supabase Cloud Storage, with only access links stored on-chain for efficiency and privacy.
 
-Key Features
-Real-time Vital Sign Monitoring: Live visualization of ECG waveforms and continuous BPM (Beats Per Minute) tracking provides immediate health insights directly from a mobile device.
+This system helps both patients (continuous monitoring from home) and doctors (secure access to verified health records between visits).
 
-Immutable Health Ledger: Patient records are stored on an Ethereum-based blockchain, guaranteeing that once a record is created, it cannot be altered or deleted, providing a single source of truth for a patient's medical history.
+How to Run
+1. Clone the Repository
+git clone https://github.com/your-username/maternal-health-app.git
+cd maternal-health-app
 
-Secure Cloud Storage Integration: Medical scans and large files are uploaded to Supabase Storage, ensuring high availability and performance while keeping the blockchain lean and efficient.
+2. Install Dependencies
+npm install
 
-Dedicated Doctor's Portal: A professional dashboard allows healthcare providers to securely onboard new patients and access their complete, chronologically-ordered medical history with verifiable integrity.
 
-Privacy-Centric Design: The application is architected with a strong focus on security, utilizing environment variables for all credentials and adhering to best practices for handling sensitive health data.
+3. Configure Environment Variables
 
+Create a .env file in the project root:
+
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+ETHEREUM_NODE_URL=your_ethereum_node_url
+PRIVATE_KEY=your_wallet_private_key
+
+4. Start the Development Server
+npm start
+
+
+5. Build for Production
+npm run build
+
+
+Frontend: Flutter / React Native
+
+Backend: Node.js / Express
+
+Blockchain: Ethereum
+
+Storage: Supabase
